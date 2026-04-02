@@ -1,0 +1,1098 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+    <title>مُولّد البريف الإبداعي الاحترافي — Brief Studio</title>
+    <meta name="description" content="أنشئ بريف إبداعي احترافي في ٦ خطوات سهلة وحمّله كـ PDF">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+    <style>
+        :root {
+            --primary: #1B2A4A;
+            --accent:  #D4AF37;
+            --accent-light: rgba(212,175,55,0.12);
+            --surface: #ffffff;
+            --bg:      #F4F6F9;
+            --text:    #1B2A4A;
+            --muted:   #6B7A99;
+            --border:  #E2E8F0;
+            --error:   #E53E3E;
+            --radius:  12px;
+            --shadow:  0 4px 24px rgba(27,42,74,0.08);
+            --ease:    all 0.3s cubic-bezier(0.4,0,0.2,1);
+        }
+        *, *::before, *::after { box-sizing: border-box; margin:0; padding:0; }
+
+        body {
+            font-family: 'Tajawal', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 30px 16px 70px;
+        }
+
+        /* HEADER */
+        .page-header { text-align:center; margin-bottom:32px; }
+        .logo-pill {
+            display:inline-flex; align-items:center; gap:8px;
+            background:var(--primary); color:var(--accent);
+            padding:9px 20px; border-radius:50px;
+            font-size:13px; font-weight:700; letter-spacing:1.2px;
+            margin-bottom:14px;
+        }
+        .logo-pill svg { width:16px; height:16px; stroke:var(--accent); fill:none; stroke-width:2; stroke-linecap:round; stroke-linejoin:round; }
+        .page-header h1 { font-size:30px; font-weight:900; color:var(--primary); }
+        .page-header p  { color:var(--muted); font-size:15px; margin-top:6px; }
+
+        /* STEPPER */
+        .stepper {
+            display:flex; align-items:flex-start; justify-content:center;
+            gap:0; margin-bottom:30px;
+            width:100%; max-width:720px;
+            overflow-x:auto; padding-bottom:4px;
+        }
+        .s-item { display:flex; flex-direction:column; align-items:center; flex:1; position:relative; min-width:56px; }
+        .s-item:not(:last-child)::after {
+            content:''; position:absolute; top:16px;
+            right:calc(-50% + 17px); left:calc(50% + 17px);
+            height:2px; background:var(--border); transition:var(--ease);
+        }
+        .s-item.done::after  { background:var(--accent); }
+        .s-item.active::after { background:var(--accent); }
+        .s-dot {
+            width:33px; height:33px; border-radius:50%;
+            border:2px solid var(--border); background:var(--surface);
+            display:flex; align-items:center; justify-content:center;
+            font-size:12px; font-weight:700; color:var(--muted);
+            transition:var(--ease); position:relative; z-index:1;
+        }
+        .s-item.active .s-dot { border-color:var(--accent); background:var(--accent); color:var(--primary); box-shadow:0 0 0 4px rgba(212,175,55,0.2); }
+        .s-item.done   .s-dot { border-color:var(--primary); background:var(--primary); color:var(--accent); }
+        .s-label { font-size:10px; margin-top:5px; color:var(--muted); text-align:center; white-space:nowrap; }
+        .s-item.active .s-label { color:var(--primary); font-weight:700; }
+        .s-item.done   .s-label { color:var(--primary); }
+
+        /* CARD */
+        .card {
+            background:var(--surface); width:100%; max-width:720px;
+            border-radius:20px; box-shadow:var(--shadow);
+            padding:40px 48px; position:relative;
+        }
+
+        /* STEP PANES */
+        .step-pane { display:none; animation:fadeUp .35s ease; }
+        .step-pane.active { display:block; }
+        @keyframes fadeUp {
+            from { opacity:0; transform:translateY(12px); }
+            to   { opacity:1; transform:translateY(0); }
+        }
+
+        .step-header { margin-bottom:26px; padding-bottom:18px; border-bottom:2px solid var(--bg); }
+        .step-badge { font-size:11px; font-weight:700; color:var(--accent); background:var(--accent-light); padding:3px 11px; border-radius:20px; display:inline-block; margin-bottom:8px; }
+        .step-header h2 { font-size:22px; font-weight:900; color:var(--primary); }
+        .step-header p  { color:var(--muted); font-size:14px; margin-top:4px; }
+
+        .domain-tag {
+            display:inline-flex; align-items:center; gap:6px;
+            background:var(--primary); color:var(--accent);
+            padding:5px 14px; border-radius:8px;
+            font-size:13px; font-weight:700; margin-bottom:18px;
+        }
+
+        /* FORM ELEMENTS */
+        .form-group { margin-bottom:22px; }
+        .form-group > label { display:block; font-weight:700; font-size:14px; color:var(--primary); margin-bottom:7px; }
+        .form-group > label .req { color:var(--error); margin-right:2px; }
+
+        input[type="text"], input[type="url"], textarea, select {
+            width:100%; padding:12px 15px;
+            border:2px solid var(--border); border-radius:var(--radius);
+            font-family:'Tajawal',sans-serif; font-size:15px; color:var(--text);
+            background:var(--surface); transition:var(--ease); appearance:none;
+        }
+        input:focus, textarea:focus, select:focus {
+            outline:none; border-color:var(--accent);
+            box-shadow:0 0 0 4px rgba(212,175,55,0.12);
+        }
+        input.err, textarea.err, select.err { border-color:var(--error); background:#FFF5F5; }
+        textarea { resize:vertical; min-height:80px; }
+        select {
+            cursor:pointer;
+            background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='7' viewBox='0 0 12 7'%3E%3Cpath fill='%236B7A99' d='M1 1l5 5 5-5'/%3E%3C/svg%3E");
+            background-repeat:no-repeat; background-position:left 14px center; padding-left:36px;
+        }
+        .field-err { display:none; color:var(--error); font-size:13px; margin-top:5px; font-weight:500; }
+        .field-err.show { display:block; }
+
+        /* CARD OPTIONS */
+        .cards-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(120px,1fr)); gap:10px; }
+        .cards-grid.two-col { grid-template-columns:1fr 1fr; }
+        .cards-grid.three-col { grid-template-columns:1fr 1fr 1fr; }
+
+        .card-opt {
+            border:2px solid var(--border); border-radius:var(--radius);
+            padding:15px 10px; text-align:center; cursor:pointer;
+            transition:var(--ease);
+            display:flex; flex-direction:column; align-items:center; gap:7px;
+        }
+        .card-opt:hover { border-color:var(--accent); background:var(--accent-light); }
+        .card-opt.sel   { border-color:var(--accent); background:var(--accent-light); box-shadow:0 0 0 3px rgba(212,175,55,0.15); }
+        .card-opt input { display:none; }
+        .c-icon  { font-size:24px; line-height:1; }
+        .c-label { font-size:12px; font-weight:700; color:var(--primary); }
+        .c-sub   { font-size:10px; color:var(--muted); }
+
+        /* SLIDERS */
+        .slider-row { background:var(--bg); border-radius:var(--radius); padding:12px 15px; margin-bottom:9px; }
+        .slider-labels { display:flex; justify-content:space-between; font-size:13px; font-weight:700; color:var(--muted); margin-bottom:8px; }
+        .slider-track  { display:flex; align-items:center; gap:10px; }
+        input[type="range"] { flex:1; height:6px; accent-color:var(--accent); cursor:pointer; }
+        .s-val { background:var(--primary); color:var(--accent); font-size:12px; font-weight:700; width:27px; height:27px; border-radius:50%; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+
+        /* CHECKBOXES */
+        .check-group { display:grid; grid-template-columns:1fr 1fr; gap:9px; }
+        .check-label {
+            display:flex; align-items:center; gap:9px; cursor:pointer;
+            padding:10px 13px; border:2px solid var(--border); border-radius:var(--radius);
+            font-size:13px; font-weight:500; transition:var(--ease);
+        }
+        .check-label:hover { border-color:var(--accent); background:var(--accent-light); }
+        .check-label input[type="checkbox"] { width:16px; height:16px; accent-color:var(--accent); flex-shrink:0; }
+
+        /* COLOR CHIPS */
+        .color-row { display:flex; flex-wrap:wrap; gap:8px; margin-top:8px; }
+        .color-chip {
+            width:34px; height:34px; border-radius:50%; cursor:pointer;
+            border:3px solid transparent; transition:var(--ease); position:relative;
+        }
+        .color-chip:hover { transform:scale(1.12); }
+        .color-chip.picked { border-color:var(--primary); box-shadow:0 0 0 3px rgba(212,175,55,0.4); }
+        .color-chip.picked::after {
+            content:'✓'; position:absolute; inset:0;
+            display:flex; align-items:center; justify-content:center;
+            color:white; font-size:13px; font-weight:900; text-shadow:0 1px 3px rgba(0,0,0,0.6);
+        }
+
+        /* BUTTONS */
+        .nav-btns {
+            display:flex; justify-content:space-between; align-items:center;
+            margin-top:32px; padding-top:22px; border-top:2px solid var(--bg); gap:10px;
+        }
+        .btn {
+            padding:12px 26px; border:none; border-radius:var(--radius);
+            font-family:'Tajawal',sans-serif; font-size:15px; font-weight:700;
+            cursor:pointer; transition:var(--ease);
+            display:flex; align-items:center; gap:7px;
+        }
+        .btn-prev   { background:var(--bg); color:var(--muted); border:2px solid var(--border); }
+        .btn-prev:hover { background:var(--border); }
+        .btn-next   { background:var(--primary); color:#fff; margin-right:auto; }
+        .btn-next:hover { background:#243660; box-shadow:0 4px 16px rgba(27,42,74,0.3); }
+        .btn-submit { background:var(--accent); color:var(--primary); margin-right:auto; }
+        .btn-submit:hover { background:#c9a227; box-shadow:0 4px 16px rgba(212,175,55,0.4); }
+
+        /* SUCCESS */
+        #successPane { display:none; animation:fadeUp .4s ease; }
+        .success-icon {
+            width:70px; height:70px;
+            background:linear-gradient(135deg,var(--primary),#243660);
+            border-radius:50%; display:flex; align-items:center; justify-content:center;
+            margin:0 auto 18px;
+        }
+        .success-icon svg { width:34px; height:34px; stroke:var(--accent); fill:none; stroke-width:2.5; stroke-linecap:round; stroke-linejoin:round; }
+
+        .brief-wrap { background:var(--bg); border-radius:var(--radius); padding:22px; margin:20px 0; }
+        .brief-wrap h3 { font-size:16px; font-weight:900; color:var(--primary); margin-bottom:16px; padding-bottom:10px; border-bottom:2px solid var(--border); }
+        .b-section { margin-bottom:16px; }
+        .b-section-title { font-size:10px; font-weight:700; color:var(--accent); text-transform:uppercase; letter-spacing:1px; margin-bottom:7px; }
+        .b-row { display:flex; justify-content:space-between; align-items:flex-start; padding:6px 0; border-bottom:1px solid var(--border); gap:14px; }
+        .b-row:last-child { border-bottom:none; }
+        .b-lbl { font-size:12px; color:var(--muted); flex-shrink:0; min-width:120px; }
+        .b-val { font-size:13px; font-weight:600; color:var(--primary); text-align:left; word-break:break-word; }
+
+        .btn-pdf   { background:var(--primary); color:var(--accent); width:100%; justify-content:center; font-size:15px; padding:15px; }
+        .btn-pdf:hover   { background:#243660; box-shadow:0 6px 20px rgba(27,42,74,0.3); }
+        .btn-img   { background:var(--surface); color:var(--primary); border:2px solid var(--primary); width:100%; justify-content:center; font-size:15px; padding:15px; margin-top:9px; }
+        .btn-img:hover   { background:var(--primary); color:#fff; }
+        .btn-reset { background:var(--bg); color:var(--muted); border:2px solid var(--border); width:100%; justify-content:center; margin-top:9px; }
+        .btn-reset:hover { background:var(--border); }
+
+        /* PROGRESS BAR */
+        .progress-bar-wrap {
+            width:100%; max-width:720px;
+            background:var(--border); border-radius:50px;
+            height:4px; margin-bottom:20px; overflow:hidden;
+        }
+        .progress-bar-fill {
+            height:100%; background:var(--accent);
+            border-radius:50px; transition:width 0.4s ease;
+        }
+
+        /* PRINT */
+        @media print {
+            body { background:#fff !important; padding:0 !important; }
+            .page-header, .stepper, .nav-btns, .btn-pdf, .btn-reset, .progress-bar-wrap { display:none !important; }
+            .card { box-shadow:none !important; padding:20px !important; max-width:100% !important; }
+            #successPane { display:block !important; }
+            .success-icon { display:none !important; }
+        }
+
+        /* RESPONSIVE */
+        @media (max-width:620px) {
+            .card { padding:22px 18px; }
+            .cards-grid { grid-template-columns:1fr 1fr; }
+            .check-group { grid-template-columns:1fr; }
+            .page-header h1 { font-size:24px; }
+            .s-label { display:none; }
+            .b-row { flex-direction:column; gap:3px; }
+            .b-val { text-align:right; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="page-header">
+    <div class="logo-pill">
+        <svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+        BRIEF STUDIO
+    </div>
+    <h1>مُولّد البريف الإبداعي</h1>
+    <p>أجب على ٦ خطوات واحصل على بريف احترافي جاهز للتحميل</p>
+</header>
+
+<!-- PROGRESS BAR -->
+<div class="progress-bar-wrap">
+    <div class="progress-bar-fill" id="progressFill" style="width:16.6%"></div>
+</div>
+
+<!-- STEPPER -->
+<nav class="stepper" id="stepperNav">
+    <div class="s-item active" data-s="0"><div class="s-dot">١</div><div class="s-label">نوع المشروع</div></div>
+    <div class="s-item"        data-s="1"><div class="s-dot">٢</div><div class="s-label">تفاصيل المجال</div></div>
+    <div class="s-item"        data-s="2"><div class="s-dot">٣</div><div class="s-label">معلومات العميل</div></div>
+    <div class="s-item"        data-s="3"><div class="s-dot">٤</div><div class="s-label">شخصية البراند</div></div>
+    <div class="s-item"        data-s="4"><div class="s-dot">٥</div><div class="s-label">التوجه البصري</div></div>
+    <div class="s-item"        data-s="5"><div class="s-dot">٦</div><div class="s-label">التفاصيل العملية</div></div>
+</nav>
+
+<!-- MAIN CARD -->
+<div class="card" id="mainCard">
+
+    <!-- PANE 0: نوع المشروع -->
+    <div class="step-pane active" id="pane0">
+        <div class="step-header">
+            <span class="step-badge">الخطوة ١ من ٦</span>
+            <h2>ما هو نوع المشروع؟</h2>
+            <p>اختر المجال الإبداعي — ستتكيف الأسئلة تلقائياً حسب اختيارك</p>
+        </div>
+        <div class="form-group">
+            <label>نوع المشروع <span class="req">*</span></label>
+            <div class="cards-grid" id="typeGrid">
+                <label class="card-opt">
+                    <input type="radio" name="projectType" value="branding" onchange="onTypeSelect(this)">
+                    <span class="c-icon">🎨</span><span class="c-label">هوية بصرية</span><span class="c-sub">شعار + Brand</span>
+                </label>
+                <label class="card-opt">
+                    <input type="radio" name="projectType" value="social" onchange="onTypeSelect(this)">
+                    <span class="c-icon">📱</span><span class="c-label">سوشيال ميديا</span><span class="c-sub">بوستات + قوالب</span>
+                </label>
+                <label class="card-opt">
+                    <input type="radio" name="projectType" value="web" onchange="onTypeSelect(this)">
+                    <span class="c-icon">🖥️</span><span class="c-label">موقع / UI-UX</span><span class="c-sub">Web Design</span>
+                </label>
+                <label class="card-opt">
+                    <input type="radio" name="projectType" value="print" onchange="onTypeSelect(this)">
+                    <span class="c-icon">📦</span><span class="c-label">مطبوعات</span><span class="c-sub">تغليف + Print</span>
+                </label>
+            </div>
+            <div class="field-err" id="err-type">الرجاء اختيار نوع المشروع أولاً ⚠️</div>
+        </div>
+    </div>
+
+    <!-- PANE 1: تفاصيل المجال (dynamic) -->
+    <div class="step-pane" id="pane1"><!-- filled by JS --></div>
+
+    <!-- PANE 2: معلومات العميل -->
+    <div class="step-pane" id="pane2">
+        <div class="step-header">
+            <span class="step-badge">الخطوة ٣ من ٦</span>
+            <h2>معلومات العميل والنشاط</h2>
+            <p>دعنا نتعرف على مشروعك بشكل أفضل</p>
+        </div>
+        <div class="form-group">
+            <label for="clientName">اسم الشركة أو المشروع <span class="req">*</span></label>
+            <input type="text" id="clientName" placeholder="مثال: شركة الأفق للعقارات">
+            <div class="field-err" id="err-clientName">هذا الحقل مطلوب ⚠️</div>
+        </div>
+        <div class="form-group">
+            <label for="clientCity">المدينة / بلد النشاط</label>
+            <input type="text" id="clientCity" placeholder="مثال: الرياض، المملكة العربية السعودية">
+        </div>
+        <div class="form-group">
+            <label for="clientDesc">بماذا يتميز نشاطك التجاري؟ <span class="req">*</span></label>
+            <textarea id="clientDesc" rows="3" placeholder="نقدم خدمات... ونتميز بـ..."></textarea>
+            <div class="field-err" id="err-clientDesc">يرجى وصف نشاطك التجاري ⚠️</div>
+        </div>
+    </div>
+
+    <!-- PANE 3: شخصية البراند -->
+    <div class="step-pane" id="pane3">
+        <div class="step-header">
+            <span class="step-badge">الخطوة ٤ من ٦</span>
+            <h2>شخصية العلامة والجمهور</h2>
+            <p>كيف تريد أن يرى الناس علامتك التجارية؟</p>
+        </div>
+        <div class="form-group">
+            <label for="targetAudience">من هو جمهورك المستهدف؟</label>
+            <textarea id="targetAudience" rows="2" placeholder="مثال: شباب 18–25 مهتمون بالتقنية والابتكار"></textarea>
+        </div>
+        <div class="form-group">
+            <label>شخصية البراند — حرك المؤشر حسب رؤيتك:</label>
+            <div class="slider-row">
+                <div class="slider-labels"><span>تقليدي</span><span>عصري / حديث</span></div>
+                <div class="slider-track"><input type="range" min="1" max="5" value="3" id="sl1" oninput="syncSlider(this,'sv1')"><div class="s-val" id="sv1">3</div></div>
+            </div>
+            <div class="slider-row">
+                <div class="slider-labels"><span>مرح / شبابي</span><span>جاد / رسمي</span></div>
+                <div class="slider-track"><input type="range" min="1" max="5" value="3" id="sl2" oninput="syncSlider(this,'sv2')"><div class="s-val" id="sv2">3</div></div>
+            </div>
+            <div class="slider-row">
+                <div class="slider-labels"><span>اقتصادي</span><span>فاخر (Premium)</span></div>
+                <div class="slider-track"><input type="range" min="1" max="5" value="3" id="sl3" oninput="syncSlider(this,'sv3')"><div class="s-val" id="sv3">3</div></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- PANE 4: التوجه البصري -->
+    <div class="step-pane" id="pane4">
+        <div class="step-header">
+            <span class="step-badge">الخطوة ٥ من ٦</span>
+            <h2>التوجه البصري</h2>
+            <p>اختر الطابع البصري الأقرب لرؤيتك (يمكن تعدد الاختيار)</p>
+        </div>
+        <div class="form-group">
+            <label>الأسلوب البصري المفضّل:</label>
+            <div class="cards-grid">
+                <label class="card-opt"><input type="checkbox" name="visualStyle" value="بسيط (Minimalist)" onchange="toggleOpt(this)"><span class="c-icon">◽</span><span class="c-label">بسيط</span><span class="c-sub">Minimalist</span></label>
+                <label class="card-opt"><input type="checkbox" name="visualStyle" value="يعتمد على الخطوط (Typography)" onchange="toggleOpt(this)"><span class="c-icon" style="font-style:italic;font-family:serif">Aa</span><span class="c-label">خطوط</span><span class="c-sub">Typography</span></label>
+                <label class="card-opt"><input type="checkbox" name="visualStyle" value="ثلاثي الأبعاد (3D)" onchange="toggleOpt(this)"><span class="c-icon">🔷</span><span class="c-label">ثلاثي الأبعاد</span><span class="c-sub">3D Style</span></label>
+                <label class="card-opt"><input type="checkbox" name="visualStyle" value="رسمي / مؤسساتي (Corporate)" onchange="toggleOpt(this)"><span class="c-icon">🏢</span><span class="c-label">مؤسساتي</span><span class="c-sub">Corporate</span></label>
+                <label class="card-opt"><input type="checkbox" name="visualStyle" value="إبداعي / تجريبي (Experimental)" onchange="toggleOpt(this)"><span class="c-icon">🎭</span><span class="c-label">إبداعي</span><span class="c-sub">Experimental</span></label>
+                <label class="card-opt"><input type="checkbox" name="visualStyle" value="كلاسيكي / تراثي (Heritage)" onchange="toggleOpt(this)"><span class="c-icon">🏛️</span><span class="c-label">كلاسيكي</span><span class="c-sub">Heritage</span></label>
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="inspirationLinks">روابط تصاميم تعجبك (إلهام)</label>
+            <textarea id="inspirationLinks" rows="2" placeholder="instagram.com/design | behance.net/project | pinterest.com/board"></textarea>
+        </div>
+    </div>
+
+    <!-- PANE 5: التفاصيل العملية -->
+    <div class="step-pane" id="pane5">
+        <div class="step-header">
+            <span class="step-badge">الخطوة ٦ من ٦</span>
+            <h2>التفاصيل العملية</h2>
+            <p>آخر خطوة وسيكون بريفك جاهزاً! 🎯</p>
+        </div>
+        <div class="form-group">
+            <label for="competitors">أبرز المنافسين (روابط أو أسماء)</label>
+            <textarea id="competitors" rows="2" placeholder="www.competitor.com أو اسم المنشأة"></textarea>
+        </div>
+        <div class="form-group">
+            <label for="budget">الميزانية المتوقعة للمشروع</label>
+            <select id="budget">
+                <option value="" disabled selected>اختر النطاق السعري</option>
+                <option value="أقل من 500$">أقل من 500$</option>
+                <option value="500$ – 1,000$">500$ – 1,000$</option>
+                <option value="1,000$ – 3,000$">1,000$ – 3,000$</option>
+                <option value="أكثر من 3,000$">أكثر من 3,000$</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label>المخرجات المطلوبة (Deliverables):</label>
+            <div class="check-group" id="dynDeliverables"></div>
+        </div>
+    </div>
+
+    <!-- SUCCESS PANE -->
+    <div id="successPane">
+        <div style="text-align:center;margin-bottom:22px;">
+            <div class="success-icon"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>
+            <h2 style="font-size:24px;font-weight:900;color:var(--primary);">البريف جاهز! 🎉</h2>
+            <p style="color:var(--muted);margin-top:6px;">راجع الملخص ثم حمّله كـ PDF</p>
+        </div>
+        <div class="brief-wrap" id="briefContent"></div>
+        <div style="display:flex;flex-direction:column;gap:9px;margin-top:6px;">
+            <button class="btn btn-pdf"   onclick="exportPDF()">📄 تحميل البريف كـ PDF</button>
+            <button class="btn btn-img"   onclick="exportImage()">🖼️ تحميل البريف كـ صورة PNG</button>
+            <button class="btn btn-reset" onclick="resetAll()">🔄 إنشاء بريف جديد</button>
+        </div>
+    </div>
+
+    <!-- NAV BUTTONS -->
+    <div class="nav-btns" id="navBtns">
+        <button class="btn btn-prev" id="prevBtn" onclick="go(-1)" style="display:none;">← السابق</button>
+        <button class="btn btn-next" id="nextBtn" onclick="go(1)">التالي →</button>
+    </div>
+
+</div><!-- /card -->
+
+<footer style="margin-top:32px;text-align:center;color:var(--muted);font-size:13px;">
+    صُنع بـ ❤️ بواسطة <strong style="color:var(--primary);">محمد حجاج</strong>
+</footer>
+
+<script>
+/* ════════════════════════════════════════════════
+   DOMAIN DEFINITIONS
+════════════════════════════════════════════════ */
+const COLORS_PALETTE = [
+    {hex:'#1B2A4A', name:'أزرق داكن'}, {hex:'#D4AF37', name:'ذهبي'},
+    {hex:'#E53E3E', name:'أحمر'},       {hex:'#2F855A', name:'أخضر'},
+    {hex:'#6B7A99', name:'رمادي'},      {hex:'#000000', name:'أسود'},
+    {hex:'#FFFFFF', name:'أبيض'},       {hex:'#ED8936', name:'برتقالي'},
+    {hex:'#805AD5', name:'بنفسجي'},     {hex:'#319795', name:'فيروزي'},
+    {hex:'#D53F8C', name:'وردي'},       {hex:'#C05621', name:'بني'},
+];
+
+function buildColorChips(prefix) {
+    return COLORS_PALETTE.map(c =>
+        `<div class="color-chip" style="background:${c.hex};${c.hex==='#FFFFFF'?'border:2px solid #ccc;':''}"
+              title="${c.name}" onclick="toggleColor(this,'${prefix}')"></div>`
+    ).join('');
+}
+
+const DOMAIN = {
+    branding: {
+        emoji: '🎨', label: 'هوية بصرية / شعار',
+        title: 'تفاصيل الهوية البصرية',
+        subtitle: 'أسئلة مخصصة لمشاريع الشعار والهوية البصرية',
+        deliverables: ['تصميم الشعار الأساسي','دليل هوية بصرية كامل','تطبيقات (كروت، أوراق رسمية)','ملفات مفتوحة المصدر','موكاب عرض احترافي'],
+        buildHtml: () => `
+        <div class="form-group">
+            <label>هل لديك شعار أو هوية حالية؟ <span class="req">*</span></label>
+            <div class="cards-grid two-col">
+                <label class="card-opt"><input type="radio" name="d_hasLogo" value="لا — أبدأ من الصفر (New Brand)" onchange="pickCard(this)">
+                    <span class="c-icon">✨</span><span class="c-label">من الصفر</span><span class="c-sub">New Brand</span></label>
+                <label class="card-opt"><input type="radio" name="d_hasLogo" value="نعم — أطوّر الهوية الحالية (Rebrand)" onchange="pickCard(this)">
+                    <span class="c-icon">🔄</span><span class="c-label">تطوير موجود</span><span class="c-sub">Rebrand</span></label>
+            </div>
+            <div class="field-err" id="err-d_hasLogo">الرجاء الاختيار ⚠️</div>
+        </div>
+        <div class="form-group">
+            <label>نوع الخط المفضل للشعار:</label>
+            <div class="cards-grid">
+                <label class="card-opt"><input type="radio" name="d_fontType" value="عربي فقط" onchange="pickCard(this)">
+                    <span class="c-icon" style="font-family:'Tajawal',sans-serif;font-size:20px">ع</span><span class="c-label">عربي فقط</span></label>
+                <label class="card-opt"><input type="radio" name="d_fontType" value="لاتيني فقط" onchange="pickCard(this)">
+                    <span class="c-icon" style="font-family:serif;font-style:italic">A</span><span class="c-label">لاتيني فقط</span></label>
+                <label class="card-opt"><input type="radio" name="d_fontType" value="ثنائي اللغة (عربي + لاتيني)" onchange="pickCard(this)">
+                    <span class="c-icon" style="font-size:17px">Aع</span><span class="c-label">ثنائي اللغة</span></label>
+                <label class="card-opt"><input type="radio" name="d_fontType" value="لا تفضيل" onchange="pickCard(this)">
+                    <span class="c-icon">🤷</span><span class="c-label">لا تفضيل</span></label>
+            </div>
+        </div>
+        <div class="form-group">
+            <label>الألوان التي تفضلها للهوية:</label>
+            <div class="color-row" id="likedColors">${buildColorChips('like')}</div>
+            <input type="text" id="d_colorsLiked" placeholder="أو اكتب هنا: أزرق، ذهبي، أسود..." style="margin-top:10px;">
+        </div>
+        <div class="form-group">
+            <label for="d_colorsReject">الألوان التي ترفضها تماماً:</label>
+            <input type="text" id="d_colorsReject" placeholder="مثال: أحمر، وردي، بنفسجي...">
+        </div>
+        <div class="form-group">
+            <label>سيُستخدم الشعار على:</label>
+            <div class="check-group">
+                <label class="check-label"><input type="checkbox" name="d_logoUse" value="خلفية فاتحة"> خلفية فاتحة</label>
+                <label class="check-label"><input type="checkbox" name="d_logoUse" value="خلفية داكنة"> خلفية داكنة</label>
+                <label class="check-label"><input type="checkbox" name="d_logoUse" value="منتجات / تغليف"> منتجات / تغليف</label>
+                <label class="check-label"><input type="checkbox" name="d_logoUse" value="طباعة رسمية (أختام / ورق)"> طباعة رسمية</label>
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="d_symbolNotes">رموز أو أشكال تريد تضمينها أو تجنبها:</label>
+            <textarea id="d_symbolNotes" rows="2" placeholder="مثال: أريد رمزاً يوحي بالنمو، وأتجنب الأشكال الحادة..."></textarea>
+        </div>`,
+        summaryRows: () => [
+            ['وضع الشعار', radioVal('d_hasLogo')],
+            ['نوع الخط', radioVal('d_fontType')],
+            ['الألوان المفضلة', fieldVal('d_colorsLiked')],
+            ['الألوان المرفوضة', fieldVal('d_colorsReject')],
+            ['استخدامات الشعار', checksVal('d_logoUse')],
+            ['ملاحظات الرموز', fieldVal('d_symbolNotes')],
+        ]
+    },
+
+    social: {
+        emoji: '📱', label: 'تصميم سوشيال ميديا',
+        title: 'تفاصيل إدارة المحتوى والتصميم',
+        subtitle: 'أسئلة مخصصة لمشاريع السوشيال ميديا',
+        deliverables: ['قوالب بوستات قابلة للتعديل','تصميم هايلايت انستغرام','تصميم بانر المنصات (Cover)','حزمة ستوري + ريلز','موشن جرافيك مقاطع'],
+        buildHtml: () => `
+        <div class="form-group">
+            <label>المنصات المستهدفة: <span class="req">*</span></label>
+            <div class="cards-grid">
+                <label class="card-opt"><input type="checkbox" name="d_platforms" value="انستغرام" onchange="toggleOpt(this)"><span class="c-icon">📸</span><span class="c-label">انستغرام</span></label>
+                <label class="card-opt"><input type="checkbox" name="d_platforms" value="تيك توك" onchange="toggleOpt(this)"><span class="c-icon">🎵</span><span class="c-label">تيك توك</span></label>
+                <label class="card-opt"><input type="checkbox" name="d_platforms" value="تويتر / X" onchange="toggleOpt(this)"><span class="c-icon">✖</span><span class="c-label">تويتر / X</span></label>
+                <label class="card-opt"><input type="checkbox" name="d_platforms" value="لينكدإن" onchange="toggleOpt(this)"><span class="c-icon">💼</span><span class="c-label">لينكدإن</span></label>
+                <label class="card-opt"><input type="checkbox" name="d_platforms" value="يوتيوب" onchange="toggleOpt(this)"><span class="c-icon">▶️</span><span class="c-label">يوتيوب</span></label>
+                <label class="card-opt"><input type="checkbox" name="d_platforms" value="سناب شات" onchange="toggleOpt(this)"><span class="c-icon">👻</span><span class="c-label">سناب شات</span></label>
+            </div>
+            <div class="field-err" id="err-d_platforms">الرجاء اختيار منصة واحدة على الأقل ⚠️</div>
+        </div>
+        <div class="form-group">
+            <label>نوع المحتوى المطلوب:</label>
+            <div class="check-group">
+                <label class="check-label"><input type="checkbox" name="d_contentType" value="تثقيفي / معلوماتي"> تثقيفي / معلوماتي</label>
+                <label class="check-label"><input type="checkbox" name="d_contentType" value="ترويجي / إعلاني"> ترويجي / إعلاني</label>
+                <label class="check-label"><input type="checkbox" name="d_contentType" value="ترفيهي / تفاعلي"> ترفيهي / تفاعلي</label>
+                <label class="check-label"><input type="checkbox" name="d_contentType" value="إخباري / تحديثات"> إخباري / تحديثات</label>
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="d_postsPerMonth">عدد التصاميم المطلوبة شهرياً:</label>
+            <select id="d_postsPerMonth">
+                <option value="" disabled selected>اختر العدد</option>
+                <option value="أقل من 10 تصاميم">أقل من 10 تصاميم</option>
+                <option value="10 – 20 تصميم">10 – 20 تصميم</option>
+                <option value="20 – 40 تصميم">20 – 40 تصميم</option>
+                <option value="أكثر من 40 تصميم">أكثر من 40 تصميم</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label>هل تحتاج موشن جرافيك / فيديو؟</label>
+            <div class="cards-grid three-col">
+                <label class="card-opt"><input type="radio" name="d_needMotion" value="نعم — ضروري" onchange="pickCard(this)"><span class="c-icon">🎬</span><span class="c-label">نعم، ضروري</span></label>
+                <label class="card-opt"><input type="radio" name="d_needMotion" value="أحياناً — حسب المحتوى" onchange="pickCard(this)"><span class="c-icon">🤔</span><span class="c-label">أحياناً</span></label>
+                <label class="card-opt"><input type="radio" name="d_needMotion" value="لا — صور ثابتة فقط" onchange="pickCard(this)"><span class="c-icon">🖼️</span><span class="c-label">ثابتة فقط</span></label>
+            </div>
+        </div>
+        <div class="form-group">
+            <label>هل لديك محتوى نصي جاهز؟</label>
+            <div class="cards-grid two-col">
+                <label class="card-opt"><input type="radio" name="d_contentReady" value="نعم — نصوص وخطة نشر جاهزة" onchange="pickCard(this)"><span class="c-icon">✅</span><span class="c-label">نعم، جاهز</span></label>
+                <label class="card-opt"><input type="radio" name="d_contentReady" value="لا — أحتاج كتابة إبداعية أيضاً" onchange="pickCard(this)"><span class="c-icon">✍️</span><span class="c-label">أحتاج كتابة</span></label>
+            </div>
+        </div>`,
+        summaryRows: () => [
+            ['المنصات المستهدفة', checksVal('d_platforms')],
+            ['نوع المحتوى', checksVal('d_contentType')],
+            ['التصاميم شهرياً', fieldVal('d_postsPerMonth')],
+            ['موشن / فيديو', radioVal('d_needMotion')],
+            ['المحتوى النصي', radioVal('d_contentReady')],
+        ]
+    },
+
+    web: {
+        emoji: '🖥️', label: 'تصميم موقع / UI-UX',
+        title: 'تفاصيل تصميم الموقع والواجهات',
+        subtitle: 'أسئلة مخصصة لمشاريع تصميم المواقع والتطبيقات',
+        deliverables: ['تصميم واجهات (UI/UX) فقط','برمجة وتطوير Front-end','تصميم متوافق مع الجوال','نماذج تفاعلية (Prototype)','تسليم ملفات Figma'],
+        buildHtml: () => `
+        <div class="form-group">
+            <label>نوع الموقع / المنصة: <span class="req">*</span></label>
+            <div class="cards-grid">
+                <label class="card-opt"><input type="radio" name="d_siteType" value="متجر إلكتروني (E-Commerce)" onchange="pickCard(this)"><span class="c-icon">🛒</span><span class="c-label">متجر إلكتروني</span></label>
+                <label class="card-opt"><input type="radio" name="d_siteType" value="موقع خدمات / شركة" onchange="pickCard(this)"><span class="c-icon">🏢</span><span class="c-label">خدمات / شركة</span></label>
+                <label class="card-opt"><input type="radio" name="d_siteType" value="بورتفوليو / معرض أعمال" onchange="pickCard(this)"><span class="c-icon">🎨</span><span class="c-label">بورتفوليو</span></label>
+                <label class="card-opt"><input type="radio" name="d_siteType" value="منصة / SaaS" onchange="pickCard(this)"><span class="c-icon">⚙️</span><span class="c-label">منصة / SaaS</span></label>
+                <label class="card-opt"><input type="radio" name="d_siteType" value="مدونة / موقع محتوى" onchange="pickCard(this)"><span class="c-icon">📝</span><span class="c-label">مدونة / محتوى</span></label>
+                <label class="card-opt"><input type="radio" name="d_siteType" value="موقع حكومي / مؤسساتي" onchange="pickCard(this)"><span class="c-icon">🏛️</span><span class="c-label">حكومي</span></label>
+            </div>
+            <div class="field-err" id="err-d_siteType">الرجاء اختيار نوع الموقع ⚠️</div>
+        </div>
+        <div class="form-group">
+            <label>ما المطلوب بالضبط؟</label>
+            <div class="cards-grid two-col">
+                <label class="card-opt"><input type="radio" name="d_scope" value="تصميم واجهات فقط (UI/UX)" onchange="pickCard(this)"><span class="c-icon">🎨</span><span class="c-label">تصميم فقط</span><span class="c-sub">UI/UX</span></label>
+                <label class="card-opt"><input type="radio" name="d_scope" value="تصميم + برمجة كاملة" onchange="pickCard(this)"><span class="c-icon">💻</span><span class="c-label">تصميم + برمجة</span><span class="c-sub">Full Stack</span></label>
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="d_pagesCount">عدد الصفحات التقريبي:</label>
+            <select id="d_pagesCount">
+                <option value="" disabled selected>اختر العدد</option>
+                <option value="1 – 5 صفحات (Landing Page)">1 – 5 صفحات (Landing Page)</option>
+                <option value="5 – 15 صفحة (موقع صغير)">5 – 15 صفحة (موقع صغير)</option>
+                <option value="15 – 40 صفحة (موقع متوسط)">15 – 40 صفحة (موقع متوسط)</option>
+                <option value="أكثر من 40 صفحة (موقع كبير)">أكثر من 40 صفحة (موقع كبير)</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label>لغة / اتجاه الموقع:</label>
+            <div class="cards-grid three-col">
+                <label class="card-opt"><input type="radio" name="d_lang" value="عربي فقط (RTL)" onchange="pickCard(this)"><span class="c-icon">🇸🇦</span><span class="c-label">عربي فقط</span></label>
+                <label class="card-opt"><input type="radio" name="d_lang" value="إنجليزي فقط (LTR)" onchange="pickCard(this)"><span class="c-icon">🇬🇧</span><span class="c-label">إنجليزي فقط</span></label>
+                <label class="card-opt"><input type="radio" name="d_lang" value="ثنائي اللغة (AR + EN)" onchange="pickCard(this)"><span class="c-icon">🌐</span><span class="c-label">ثنائي اللغة</span></label>
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="d_cms">المنصة / CMS المفضل:</label>
+            <select id="d_cms">
+                <option value="" disabled selected>اختر المنصة</option>
+                <option value="WordPress">WordPress</option>
+                <option value="Webflow">Webflow</option>
+                <option value="Shopify (للمتاجر)">Shopify (للمتاجر)</option>
+                <option value="React / Next.js">React / Next.js</option>
+                <option value="تطوير مخصص (Custom)">تطوير مخصص (Custom)</option>
+                <option value="لا تفضيل">لا تفضيل — أنت تقترح</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label>هل هناك wireframes أو محتوى جاهز؟</label>
+            <div class="cards-grid three-col">
+                <label class="card-opt"><input type="radio" name="d_wireframes" value="لدي Wireframes جاهزة" onchange="pickCard(this)"><span class="c-icon">📐</span><span class="c-label">Wireframes جاهزة</span></label>
+                <label class="card-opt"><input type="radio" name="d_wireframes" value="محتوى نصي فقط" onchange="pickCard(this)"><span class="c-icon">📄</span><span class="c-label">محتوى نصي فقط</span></label>
+                <label class="card-opt"><input type="radio" name="d_wireframes" value="لا شيء — ابدأ من الصفر" onchange="pickCard(this)"><span class="c-icon">🆕</span><span class="c-label">من الصفر تماماً</span></label>
+            </div>
+        </div>`,
+        summaryRows: () => [
+            ['نوع الموقع', radioVal('d_siteType')],
+            ['نطاق العمل', radioVal('d_scope')],
+            ['عدد الصفحات', fieldVal('d_pagesCount')],
+            ['لغة الموقع', radioVal('d_lang')],
+            ['المنصة / CMS', fieldVal('d_cms')],
+            ['Wireframes / محتوى', radioVal('d_wireframes')],
+        ]
+    },
+
+    print: {
+        emoji: '📦', label: 'مطبوعات / تغليف',
+        title: 'تفاصيل المطبوعات والتغليف',
+        subtitle: 'أسئلة مخصصة لمشاريع الطباعة والتغليف',
+        deliverables: ['تصميم الغلاف / التغليف','ملفات جاهزة للطباعة (PDF/AI)','موكاب عرض احترافي','طباعة وتسليم فعلي','ملفات مفتوحة المصدر'],
+        buildHtml: () => `
+        <div class="form-group">
+            <label>نوع المطبوعات المطلوبة: <span class="req">*</span></label>
+            <div class="check-group">
+                <label class="check-label"><input type="checkbox" name="d_printTypes" value="بطاقات أعمال (Business Cards)"> بطاقات أعمال</label>
+                <label class="check-label"><input type="checkbox" name="d_printTypes" value="كتيب / بروشور"> كتيب / بروشور</label>
+                <label class="check-label"><input type="checkbox" name="d_printTypes" value="بنر / رول أب"> بنر / رول أب</label>
+                <label class="check-label"><input type="checkbox" name="d_printTypes" value="تغليف منتج / عبوة"> تغليف منتج / عبوة</label>
+                <label class="check-label"><input type="checkbox" name="d_printTypes" value="فلاير / إعلان مطبوع"> فلاير / إعلان مطبوع</label>
+                <label class="check-label"><input type="checkbox" name="d_printTypes" value="ورق رسمي / مغلفات"> ورق رسمي / مغلفات</label>
+            </div>
+            <div class="field-err" id="err-d_printTypes">الرجاء اختيار نوع واحد على الأقل ⚠️</div>
+        </div>
+        <div class="form-group">
+            <label for="d_dimensions">الأبعاد أو الحجم المطلوب:</label>
+            <input type="text" id="d_dimensions" placeholder="مثال: A4، 10×15 سم، مربع 30×30 سم...">
+        </div>
+        <div class="form-group">
+            <label>نوع الطباعة:</label>
+            <div class="cards-grid">
+                <label class="card-opt"><input type="radio" name="d_printMethod" value="رقمية (Digital)" onchange="pickCard(this)"><span class="c-icon">🖨️</span><span class="c-label">رقمية</span><span class="c-sub">Digital</span></label>
+                <label class="card-opt"><input type="radio" name="d_printMethod" value="أوفست (Offset)" onchange="pickCard(this)"><span class="c-icon">🏭</span><span class="c-label">أوفست</span><span class="c-sub">Offset</span></label>
+                <label class="card-opt"><input type="radio" name="d_printMethod" value="سيلك سكرين" onchange="pickCard(this)"><span class="c-icon">🎭</span><span class="c-label">سيلك سكرين</span></label>
+                <label class="card-opt"><input type="radio" name="d_printMethod" value="لا أعرف — أنت تقترح" onchange="pickCard(this)"><span class="c-icon">🤷</span><span class="c-label">لا أعرف</span></label>
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="d_printQty">الكمية المطلوب طباعتها:</label>
+            <select id="d_printQty">
+                <option value="" disabled selected>اختر الكمية</option>
+                <option value="أقل من 100 نسخة">أقل من 100 نسخة</option>
+                <option value="100 – 500 نسخة">100 – 500 نسخة</option>
+                <option value="500 – 2000 نسخة">500 – 2000 نسخة</option>
+                <option value="أكثر من 2000 نسخة">أكثر من 2000 نسخة</option>
+                <option value="لم يُحدد بعد">لم يُحدد بعد</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label>هل تحتاج موكاب (Mockup) للعرض؟</label>
+            <div class="cards-grid two-col">
+                <label class="card-opt"><input type="radio" name="d_needMockup" value="نعم — موكاب مطلوب" onchange="pickCard(this)"><span class="c-icon">🖼️</span><span class="c-label">نعم، ضروري</span></label>
+                <label class="card-opt"><input type="radio" name="d_needMockup" value="لا — ملفات التصميم تكفي" onchange="pickCard(this)"><span class="c-icon">📁</span><span class="c-label">ملفات فقط</span></label>
+            </div>
+        </div>
+        <div class="form-group">
+            <label>مواد متوفرة لديك:</label>
+            <div class="check-group">
+                <label class="check-label"><input type="checkbox" name="d_assets" value="صور / فوتوغرافي"> صور / فوتوغرافي</label>
+                <label class="check-label"><input type="checkbox" name="d_assets" value="نصوص جاهزة"> نصوص جاهزة</label>
+                <label class="check-label"><input type="checkbox" name="d_assets" value="شعار / هوية بصرية"> شعار / هوية بصرية</label>
+                <label class="check-label"><input type="checkbox" name="d_assets" value="لا شيء — ستوفر كل شيء"> لا شيء</label>
+            </div>
+        </div>`,
+        summaryRows: () => [
+            ['أنواع المطبوعات', checksVal('d_printTypes')],
+            ['الأبعاد / الحجم', fieldVal('d_dimensions')],
+            ['نوع الطباعة', radioVal('d_printMethod')],
+            ['الكمية المطلوبة', fieldVal('d_printQty')],
+            ['موكاب للعرض', radioVal('d_needMockup')],
+            ['مواد متوفرة', checksVal('d_assets')],
+        ]
+    }
+};
+
+/* ════════════════════════════════════════════════
+   STATE
+════════════════════════════════════════════════ */
+let cur = 0;
+const TOTAL = 6;
+const getPanes  = () => document.querySelectorAll('.step-pane');
+const getSteps  = () => document.querySelectorAll('.s-item');
+
+/* ════════════════════════════════════════════════
+   DATA HELPERS
+════════════════════════════════════════════════ */
+const fieldVal  = id => document.getElementById(id)?.value?.trim() || '—';
+const radioVal  = name => document.querySelector(`input[name="${name}"]:checked`)?.value || '—';
+const checksVal = name => [...document.querySelectorAll(`input[name="${name}"]:checked`)].map(i=>i.value).join('، ') || '—';
+
+/* ════════════════════════════════════════════════
+   COLOR CHIPS
+════════════════════════════════════════════════ */
+function toggleColor(el) {
+    el.classList.toggle('picked');
+    const picked = [...document.querySelectorAll('#likedColors .color-chip.picked')].map(c => c.title);
+    const inp = document.getElementById('d_colorsLiked');
+    if (inp && picked.length) inp.value = picked.join('، ');
+    else if (inp && !picked.length) inp.value = '';
+}
+
+/* ════════════════════════════════════════════════
+   CARD HELPERS
+════════════════════════════════════════════════ */
+function pickCard(input) {
+    input.closest('.cards-grid').querySelectorAll('.card-opt').forEach(c => c.classList.remove('sel'));
+    input.parentElement.classList.add('sel');
+}
+function toggleOpt(input) {
+    input.parentElement.classList.toggle('sel', input.checked);
+}
+
+function onTypeSelect(input) {
+    pickCard(input);
+    renderDomainPane(input.value);
+    buildDeliverables(input.value);
+}
+
+/* ════════════════════════════════════════════════
+   DOMAIN PANE RENDER
+════════════════════════════════════════════════ */
+function renderDomainPane(type) {
+    const cfg = DOMAIN[type];
+    if (!cfg) return;
+    document.getElementById('pane1').innerHTML = `
+        <div class="step-header">
+            <span class="step-badge">الخطوة ٢ من ٦</span>
+            <div class="domain-tag">${cfg.emoji} ${cfg.label}</div>
+            <h2>${cfg.title}</h2>
+            <p>${cfg.subtitle}</p>
+        </div>
+        ${cfg.buildHtml()}`;
+}
+
+/* ════════════════════════════════════════════════
+   DELIVERABLES
+════════════════════════════════════════════════ */
+function buildDeliverables(type) {
+    const container = document.getElementById('dynDeliverables');
+    container.innerHTML = '';
+    (DOMAIN[type]?.deliverables || []).forEach(item => {
+        const lbl = document.createElement('label');
+        lbl.className = 'check-label';
+        lbl.innerHTML = `<input type="checkbox" name="deliverable" value="${item}"> ${item}`;
+        container.appendChild(lbl);
+    });
+}
+
+/* ════════════════════════════════════════════════
+   SLIDERS
+════════════════════════════════════════════════ */
+function syncSlider(input, valId) {
+    document.getElementById(valId).textContent = input.value;
+}
+
+/* ════════════════════════════════════════════════
+   VALIDATION
+════════════════════════════════════════════════ */
+function showErr(id, show) { document.getElementById(id)?.classList.toggle('show', show); }
+function markField(el, bad) { el.classList.toggle('err', bad); }
+
+function validatePane(n) {
+    let ok = true;
+
+    if (n === 0) {
+        const sel = document.querySelector('input[name="projectType"]:checked');
+        showErr('err-type', !sel); if (!sel) ok = false;
+    }
+
+    if (n === 1) {
+        const type = document.querySelector('input[name="projectType"]:checked')?.value;
+        if (type === 'branding') {
+            const v = document.querySelector('input[name="d_hasLogo"]:checked');
+            showErr('err-d_hasLogo', !v); if (!v) ok = false;
+        }
+        if (type === 'social') {
+            const v = document.querySelector('input[name="d_platforms"]:checked');
+            showErr('err-d_platforms', !v); if (!v) ok = false;
+        }
+        if (type === 'web') {
+            const v = document.querySelector('input[name="d_siteType"]:checked');
+            showErr('err-d_siteType', !v); if (!v) ok = false;
+        }
+        if (type === 'print') {
+            const v = document.querySelector('input[name="d_printTypes"]:checked');
+            showErr('err-d_printTypes', !v); if (!v) ok = false;
+        }
+    }
+
+    if (n === 2) {
+        const nm = document.getElementById('clientName');
+        const ds = document.getElementById('clientDesc');
+        const nb = !nm.value.trim(), db = !ds.value.trim();
+        showErr('err-clientName', nb); markField(nm, nb); if (nb) ok = false;
+        showErr('err-clientDesc', db); markField(ds, db); if (db) ok = false;
+    }
+
+    return ok;
+}
+
+/* ════════════════════════════════════════════════
+   PROGRESS BAR
+════════════════════════════════════════════════ */
+function updateProgress(step) {
+    const pct = ((step + 1) / TOTAL) * 100;
+    document.getElementById('progressFill').style.width = pct + '%';
+}
+
+/* ════════════════════════════════════════════════
+   NAVIGATION
+════════════════════════════════════════════════ */
+function go(dir) {
+    if (dir === 1 && !validatePane(cur)) return;
+    cur += dir;
+    if (cur >= TOTAL) { buildSuccess(); return; }
+
+    updateProgress(cur);
+    getPanes().forEach((p,i) => p.classList.toggle('active', i === cur));
+    getSteps().forEach((s,i) => {
+        s.classList.remove('active','done');
+        if (i === cur) s.classList.add('active');
+        else if (i < cur) s.classList.add('done');
+        s.querySelector('.s-dot').textContent = i < cur ? '✓' : ['١','٢','٣','٤','٥','٦'][i];
+    });
+
+    document.getElementById('prevBtn').style.display = cur === 0 ? 'none' : 'flex';
+    const nb = document.getElementById('nextBtn');
+    if (cur === TOTAL - 1) { nb.textContent = 'إنشاء البريف ✨'; nb.className = 'btn btn-submit'; }
+    else                   { nb.textContent = 'التالي →';       nb.className = 'btn btn-next'; }
+
+    window.scrollTo({top:0, behavior:'smooth'});
+}
+
+/* ════════════════════════════════════════════════
+   BUILD SUCCESS SUMMARY
+════════════════════════════════════════════════ */
+function mkSection(title, rows) {
+    const r = rows.map(([l,v]) =>
+        `<div class="b-row"><span class="b-lbl">${l}</span><span class="b-val">${v}</span></div>`
+    ).join('');
+    return `<div class="b-section"><div class="b-section-title">${title}</div>${r}</div>`;
+}
+
+function sliderLabel(val, lo, hi) {
+    const map = ['',`${lo} (١)`,`${lo} نسبياً (٢)`,'محايد (٣)',`${hi} نسبياً (٤)`,`${hi} (٥)`];
+    return map[+val] || val;
+}
+
+function buildSuccess() {
+    getPanes().forEach(p => p.classList.remove('active'));
+    document.getElementById('navBtns').style.display = 'none';
+    document.getElementById('stepperNav').style.display = 'none';
+    document.querySelector('.progress-bar-wrap').style.display = 'none';
+
+    const type = document.querySelector('input[name="projectType"]:checked')?.value || '';
+    const cfg  = DOMAIN[type];
+    const date = new Date().toLocaleDateString('ar-SA', {year:'numeric',month:'long',day:'numeric'});
+
+    const domainSection = cfg
+        ? mkSection(`تفاصيل — ${cfg.label}`, cfg.summaryRows())
+        : '';
+
+    document.getElementById('briefContent').innerHTML = `
+        <h3>📋 ملخص البريف — ${date}</h3>
+        ${mkSection('المشروع', [['النوع', cfg ? `${cfg.emoji} ${cfg.label}` : '—']])}
+        ${mkSection('معلومات العميل', [
+            ['اسم الجهة',      fieldVal('clientName')],
+            ['المدينة / البلد', fieldVal('clientCity')],
+            ['وصف النشاط',     fieldVal('clientDesc')],
+        ])}
+        ${domainSection}
+        ${mkSection('شخصية العلامة والجمهور', [
+            ['الجمهور المستهدف', fieldVal('targetAudience')],
+            ['تقليدي ↔ عصري', sliderLabel(document.getElementById('sl1').value,'تقليدي','عصري')],
+            ['مرح ↔ رسمي',    sliderLabel(document.getElementById('sl2').value,'مرح/شبابي','جاد/رسمي')],
+            ['اقتصادي ↔ فاخر', sliderLabel(document.getElementById('sl3').value,'اقتصادي','فاخر/Premium')],
+        ])}
+        ${mkSection('التوجه البصري', [
+            ['الأسلوب البصري', checksVal('visualStyle')],
+            ['مصادر الإلهام',  fieldVal('inspirationLinks')],
+        ])}
+        ${mkSection('التفاصيل العملية', [
+            ['المنافسون',         fieldVal('competitors')],
+            ['الميزانية',         fieldVal('budget')],
+            ['المخرجات المطلوبة', checksVal('deliverable')],
+        ])}
+    `;
+
+    document.getElementById('successPane').style.display = 'block';
+}
+
+/* ════════════════════════════════════════════════
+   CAPTURE HELPER — يلتقط العنصر كـ Canvas
+════════════════════════════════════════════════ */
+async function captureElement(element) {
+    if (typeof window.html2canvas !== 'function') {
+        throw new Error('مكتبة html2canvas لم تُحمَّل — تأكد من اتصالك بالإنترنت وأعد تحميل الصفحة.');
+    }
+    await document.fonts.ready;
+    return window.html2canvas(element, {
+        scale: 2,
+        useCORS: true,
+        allowTaint: true,
+        logging: false,
+        backgroundColor: '#F4F6F9',
+        scrollX: 0,
+        scrollY: -window.scrollY,
+        windowWidth: element.scrollWidth,
+        windowHeight: element.scrollHeight,
+        onclone: (clonedDoc) => {
+            clonedDoc.querySelectorAll('*').forEach(el => {
+                el.style.letterSpacing = '0px';
+                el.style.wordSpacing   = '0px';
+            });
+        },
+    });
+}
+
+/* ════════════════════════════════════════════════
+   PDF EXPORT — تحويل إلى صورة ثم PDF
+════════════════════════════════════════════════ */
+async function exportPDF() {
+    const btn = document.querySelector('.btn-pdf');
+    btn.textContent = '⏳ جاري التحضير...'; btn.disabled = true;
+
+    const element = document.getElementById('briefContent');
+
+    try {
+        const canvas = await captureElement(element);
+
+        const pdf = new window.jspdf.jsPDF({
+            unit: 'mm',
+            format: 'a4',
+            orientation: 'portrait'
+        });
+
+        const pageW  = pdf.internal.pageSize.getWidth();
+        const pageH  = pdf.internal.pageSize.getHeight();
+        const margin = 10;
+        const imgW   = pageW - margin * 2;
+        const imgH   = (canvas.height * imgW) / canvas.width;
+
+        let yRemaining = imgH;
+        let yOffset    = 0;
+
+        while (yRemaining > 0) {
+            const sliceH = Math.min(yRemaining, pageH - margin * 2);
+
+            const pageCanvas  = document.createElement('canvas');
+            const scaleRatio  = canvas.width / imgW;
+            pageCanvas.width  = canvas.width;
+            pageCanvas.height = sliceH * scaleRatio;
+
+            const ctx = pageCanvas.getContext('2d');
+            ctx.drawImage(
+                canvas,
+                0, yOffset * scaleRatio,
+                canvas.width, pageCanvas.height,
+                0, 0,
+                canvas.width, pageCanvas.height
+            );
+
+            const sliceData = pageCanvas.toDataURL('image/jpeg', 0.95);
+            pdf.addImage(sliceData, 'JPEG', margin, margin, imgW, sliceH);
+
+            yOffset    += sliceH;
+            yRemaining -= sliceH;
+
+            if (yRemaining > 0) pdf.addPage();
+        }
+
+        pdf.save(`brief_${fieldVal('clientName') || 'project'}.pdf`);
+
+    } catch (err) {
+        console.error('PDF export failed:', err);
+        alert('⚠️ ' + (err?.message || 'حدث خطأ أثناء تصدير PDF، يرجى المحاولة مجدداً.'));
+    } finally {
+        btn.innerHTML = '📄 تحميل البريف كـ PDF'; btn.disabled = false;
+    }
+}
+
+/* ════════════════════════════════════════════════
+   IMAGE EXPORT — تحميل البريف كـ PNG
+════════════════════════════════════════════════ */
+async function exportImage() {
+    const btn = document.querySelector('.btn-img');
+    btn.textContent = '⏳ جاري التحضير...'; btn.disabled = true;
+
+    const element = document.getElementById('briefContent');
+
+    try {
+        const canvas = await captureElement(element);
+        const link = document.createElement('a');
+        link.download = `brief_${fieldVal('clientName') || 'project'}.png`;
+        link.href = canvas.toDataURL('image/png');
+        link.click();
+    } catch (err) {
+        console.error('Image export failed:', err);
+        alert('حدث خطأ أثناء تصدير الصورة، يرجى المحاولة مجدداً.');
+    } finally {
+        btn.innerHTML = '🖼️ تحميل البريف كـ صورة PNG'; btn.disabled = false;
+    }
+}
+
+/* ════════════════════════════════════════════════
+   RESET
+════════════════════════════════════════════════ */
+function resetAll() {
+    cur = 0;
+    document.getElementById('successPane').style.display = 'none';
+    document.getElementById('navBtns').style.display = 'flex';
+    document.getElementById('stepperNav').style.display = 'flex';
+    document.querySelector('.progress-bar-wrap').style.display = 'block';
+    document.querySelectorAll('input[type="text"],textarea,select').forEach(el => el.value='');
+    document.querySelectorAll('input[type="radio"],input[type="checkbox"]').forEach(el => el.checked=false);
+    document.querySelectorAll('.card-opt,.color-chip').forEach(el => el.classList.remove('sel','picked'));
+    ['sl1','sl2','sl3'].forEach((id,i) => {
+        document.getElementById(id).value = 3;
+        document.getElementById(['sv1','sv2','sv3'][i]).textContent = 3;
+    });
+    document.getElementById('dynDeliverables').innerHTML = '';
+    document.getElementById('pane1').innerHTML = '';
+    getPanes().forEach((p,i) => p.classList.toggle('active', i===0));
+    getSteps().forEach((s,i) => {
+        s.classList.remove('active','done');
+        if(i===0) s.classList.add('active');
+        s.querySelector('.s-dot').textContent = ['١','٢','٣','٤','٥','٦'][i];
+    });
+    updateProgress(0);
+    document.getElementById('prevBtn').style.display = 'none';
+    const nb = document.getElementById('nextBtn');
+    nb.textContent = 'التالي →'; nb.className = 'btn btn-next';
+    window.scrollTo({top:0,behavior:'smooth'});
+}
+</script>
+</body>
+</html>
