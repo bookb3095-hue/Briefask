@@ -235,13 +235,45 @@
             border-radius:50px; transition:width 0.4s ease;
         }
 
+
+        /* KNOWLEDGE-GAP FIXES */
+        .hint { display:block; color:var(--muted); font-size:12px; line-height:1.6; margin-top:5px; }
+        .mini-grid { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+        .textarea-tall { min-height:108px; }
+        .b-note { background:#fff; border:1px solid var(--border); border-radius:10px; padding:10px 12px; margin:10px 0 14px; color:var(--muted); font-size:12px; line-height:1.7; }
+        .btn-copy { background:#fff; color:var(--primary); border:2px solid var(--border); width:100%; justify-content:center; font-size:15px; padding:15px; margin-top:9px; }
+        .btn-copy:hover { border-color:var(--accent); background:var(--accent-light); }
+        @media (max-width:620px) { .mini-grid { grid-template-columns:1fr; } }
+
+
+        /* EXPORT IMPROVEMENTS */
+        .export-toolbar { display:grid; grid-template-columns:1fr 1fr; gap:9px; margin-top:10px; }
+        .export-toolbar .btn { width:100%; justify-content:center; font-size:14px; padding:13px; }
+        .btn-print { background:#fff; color:var(--primary); border:2px solid var(--accent); }
+        .btn-print:hover { background:var(--accent-light); }
+        .btn-html { background:#fff; color:var(--primary); border:2px solid var(--border); }
+        .btn-html:hover { border-color:var(--accent); background:var(--accent-light); }
+        .btn-json { background:var(--bg); color:var(--primary); border:2px solid var(--border); }
+        .btn-json:hover { border-color:var(--accent); }
+        .export-status { display:none; margin-top:12px; padding:10px 12px; border-radius:10px; background:var(--accent-light); color:var(--primary); font-size:13px; text-align:center; border:1px solid rgba(212,175,55,.25); }
+        .export-status.show { display:block; }
+        .brief-export-meta { display:flex; flex-wrap:wrap; gap:7px; margin:-4px 0 16px; }
+        .brief-export-meta span { background:#fff; border:1px solid var(--border); color:var(--muted); border-radius:999px; padding:5px 10px; font-size:11px; font-weight:700; }
+        .brief-export-footer { margin-top:18px; padding-top:12px; border-top:2px solid var(--border); color:var(--muted); font-size:11px; text-align:center; }
+        .b-section { break-inside:avoid; page-break-inside:avoid; }
+        @media (max-width:620px) { .export-toolbar { grid-template-columns:1fr; } }
+
         /* PRINT */
+        @page { size:A4; margin:12mm; }
         @media print {
-            body { background:#fff !important; padding:0 !important; }
-            .page-header, .stepper, .nav-btns, .btn-pdf, .btn-reset, .progress-bar-wrap { display:none !important; }
-            .card { box-shadow:none !important; padding:20px !important; max-width:100% !important; }
-            #successPane { display:block !important; }
-            .success-icon { display:none !important; }
+            html, body { background:#fff !important; padding:0 !important; margin:0 !important; }
+            body * { visibility:hidden !important; }
+            #briefContent, #briefContent * { visibility:visible !important; }
+            #briefContent { position:absolute !important; inset:0 auto auto 0 !important; width:100% !important; background:#fff !important; color:#111 !important; box-shadow:none !important; padding:0 !important; margin:0 !important; }
+            .brief-wrap { background:#fff !important; padding:0 !important; margin:0 !important; }
+            .b-section { break-inside:avoid !important; page-break-inside:avoid !important; margin-bottom:12px !important; }
+            .b-row { break-inside:avoid !important; page-break-inside:avoid !important; }
+            .brief-export-meta span { background:#fff !important; }
         }
 
         /* RESPONSIVE */
@@ -265,7 +297,7 @@
         BRIEF STUDIO
     </div>
     <h1>مُولّد البريف الإبداعي</h1>
-    <p>أجب على ٦ خطوات واحصل على بريف احترافي جاهز للتحميل</p>
+    <p>أجب على ٦ خطوات ذكية واحصل على بريف شامل يقلّل سوء الفهم قبل بدء التصميم</p>
 </header>
 
 <!-- PROGRESS BAR -->
@@ -325,21 +357,69 @@
         <div class="step-header">
             <span class="step-badge">الخطوة ٣ من ٦</span>
             <h2>معلومات العميل والنشاط</h2>
-            <p>دعنا نتعرف على مشروعك بشكل أفضل</p>
+            <p>نحتاج معلومات تشغيلية وتسويقية كافية حتى لا يصبح البريف عاماً أو ناقصاً</p>
         </div>
-        <div class="form-group">
-            <label for="clientName">اسم الشركة أو المشروع <span class="req">*</span></label>
-            <input type="text" id="clientName" placeholder="مثال: شركة الأفق للعقارات">
-            <div class="field-err" id="err-clientName">هذا الحقل مطلوب ⚠️</div>
+        <div class="mini-grid">
+            <div class="form-group">
+                <label for="clientName">اسم الشركة أو المشروع <span class="req">*</span></label>
+                <input type="text" id="clientName" placeholder="مثال: شركة الأفق للعقارات">
+                <div class="field-err" id="err-clientName">هذا الحقل مطلوب ⚠️</div>
+            </div>
+            <div class="form-group">
+                <label for="clientCity">المدينة / بلد النشاط</label>
+                <input type="text" id="clientCity" placeholder="مثال: الرياض، المملكة العربية السعودية">
+            </div>
         </div>
-        <div class="form-group">
-            <label for="clientCity">المدينة / بلد النشاط</label>
-            <input type="text" id="clientCity" placeholder="مثال: الرياض، المملكة العربية السعودية">
+        <div class="mini-grid">
+            <div class="form-group">
+                <label for="contactName">الشخص المسؤول عن التواصل / القرار <span class="req">*</span></label>
+                <input type="text" id="contactName" placeholder="مثال: محمد — مدير التسويق">
+                <div class="field-err" id="err-contactName">حدد شخص التواصل أو صاحب القرار ⚠️</div>
+            </div>
+            <div class="form-group">
+                <label for="contactMethod">وسيلة التواصل المفضلة <span class="req">*</span></label>
+                <input type="text" id="contactMethod" placeholder="واتساب، إيميل، اجتماع أسبوعي...">
+                <div class="field-err" id="err-contactMethod">حدد وسيلة التواصل لتجنب تعطّل الاعتمادات ⚠️</div>
+            </div>
         </div>
         <div class="form-group">
             <label for="clientDesc">بماذا يتميز نشاطك التجاري؟ <span class="req">*</span></label>
-            <textarea id="clientDesc" rows="3" placeholder="نقدم خدمات... ونتميز بـ..."></textarea>
+            <textarea id="clientDesc" rows="3" class="textarea-tall" placeholder="ماذا تقدم؟ لمن؟ وما الذي يجعلك مختلفاً عن البدائل؟"></textarea>
+            <span class="hint">مثال قوي: نساعد أصحاب المطاعم الصغيرة على زيادة الطلبات عبر هوية مرئية وتصوير وقوائم رقمية.</span>
             <div class="field-err" id="err-clientDesc">يرجى وصف نشاطك التجاري ⚠️</div>
+        </div>
+        <div class="mini-grid">
+            <div class="form-group">
+                <label for="businessStage">مرحلة المشروع الحالية</label>
+                <select id="businessStage">
+                    <option value="" disabled selected>اختر المرحلة</option>
+                    <option value="فكرة جديدة قبل الإطلاق">فكرة جديدة قبل الإطلاق</option>
+                    <option value="إطلاق أولي / MVP">إطلاق أولي / MVP</option>
+                    <option value="نشاط قائم يحتاج تحسيناً">نشاط قائم يحتاج تحسيناً</option>
+                    <option value="إعادة تموضع أو توسع">إعادة تموضع أو توسع</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="brandPromise">الوعد الأساسي للعميل</label>
+                <input type="text" id="brandPromise" placeholder="مثال: تصميم سريع وراقي بسعر مناسب">
+            </div>
+        </div>
+        <div class="form-group">
+            <label>أهداف المشروع التجارية <span class="req">*</span></label>
+            <div class="check-group">
+                <label class="check-label"><input type="checkbox" name="projectGoals" value="زيادة المبيعات / الحجوزات"> زيادة المبيعات / الحجوزات</label>
+                <label class="check-label"><input type="checkbox" name="projectGoals" value="بناء الثقة والمصداقية"> بناء الثقة والمصداقية</label>
+                <label class="check-label"><input type="checkbox" name="projectGoals" value="إطلاق منتج أو خدمة جديدة"> إطلاق منتج أو خدمة جديدة</label>
+                <label class="check-label"><input type="checkbox" name="projectGoals" value="تمييز العلامة عن المنافسين"> تمييز العلامة عن المنافسين</label>
+                <label class="check-label"><input type="checkbox" name="projectGoals" value="رفع التفاعل على المنصات"> رفع التفاعل على المنصات</label>
+                <label class="check-label"><input type="checkbox" name="projectGoals" value="توحيد الهوية والمواد التسويقية"> توحيد الهوية والمواد التسويقية</label>
+            </div>
+            <input type="text" id="projectGoalsOther" placeholder="هدف آخر أو مؤشر رقمي محدد" style="margin-top:10px;">
+            <div class="field-err" id="err-projectGoals">اختر هدفاً واحداً على الأقل حتى يكون التصميم موجهاً لا عشوائياً ⚠️</div>
+        </div>
+        <div class="form-group">
+            <label for="problemSolve">ما المشكلة التي يجب أن يحلها التصميم؟</label>
+            <textarea id="problemSolve" rows="2" placeholder="مثال: الناس لا يفهمون الفرق بيننا وبين المنافسين، أو حسابنا غير موحد بصرياً..."></textarea>
         </div>
     </div>
 
@@ -348,11 +428,39 @@
         <div class="step-header">
             <span class="step-badge">الخطوة ٤ من ٦</span>
             <h2>شخصية العلامة والجمهور</h2>
-            <p>كيف تريد أن يرى الناس علامتك التجارية؟</p>
+            <p>حدد الجمهور والرسالة والسلوك المطلوب — لا يكفي اختيار شكل جميل فقط</p>
         </div>
         <div class="form-group">
-            <label for="targetAudience">من هو جمهورك المستهدف؟</label>
-            <textarea id="targetAudience" rows="2" placeholder="مثال: شباب 18–25 مهتمون بالتقنية والابتكار"></textarea>
+            <label for="targetAudience">من هو جمهورك المستهدف؟ <span class="req">*</span></label>
+            <textarea id="targetAudience" rows="2" placeholder="العمر، الموقع، مستوى الدخل، الاهتمامات، وسلوك الشراء..."></textarea>
+            <div class="field-err" id="err-targetAudience">حدد الجمهور المستهدف لتجنب تصميم عام لا يخاطب أحداً ⚠️</div>
+        </div>
+        <div class="mini-grid">
+            <div class="form-group">
+                <label for="audiencePain">أهم احتياج / ألم لدى الجمهور</label>
+                <textarea id="audiencePain" rows="2" placeholder="ما الذي يقلقهم؟ ما العائق الذي يمنعهم من الشراء؟"></textarea>
+            </div>
+            <div class="form-group">
+                <label for="desiredAction">الفعل المطلوب من الجمهور</label>
+                <input type="text" id="desiredAction" placeholder="شراء، حجز، متابعة، طلب عرض سعر، تحميل تطبيق...">
+            </div>
+        </div>
+        <div class="mini-grid">
+            <div class="form-group">
+                <label for="brandTone">نبرة التواصل اللفظية</label>
+                <select id="brandTone">
+                    <option value="" disabled selected>اختر النبرة</option>
+                    <option value="ودودة وبسيطة">ودودة وبسيطة</option>
+                    <option value="خبيرة وموثوقة">خبيرة وموثوقة</option>
+                    <option value="فاخرة وهادئة">فاخرة وهادئة</option>
+                    <option value="جريئة وشبابية">جريئة وشبابية</option>
+                    <option value="رسمية ومؤسساتية">رسمية ومؤسساتية</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="mainMessage">الرسالة الرئيسية التي يجب تذكرها</label>
+                <input type="text" id="mainMessage" placeholder="جملة واحدة تلخص الفكرة أو الوعد">
+            </div>
         </div>
         <div class="form-group">
             <label>شخصية البراند — حرك المؤشر حسب رؤيتك:</label>
@@ -376,7 +484,7 @@
         <div class="step-header">
             <span class="step-badge">الخطوة ٥ من ٦</span>
             <h2>التوجه البصري</h2>
-            <p>اختر الطابع البصري الأقرب لرؤيتك (يمكن تعدد الاختيار)</p>
+            <p>اجمع بين الإلهام والقيود والمواد المتاحة حتى لا يكون الاتجاه البصري عشوائياً</p>
         </div>
         <div class="form-group">
             <label>الأسلوب البصري المفضّل:</label>
@@ -392,6 +500,33 @@
         <div class="form-group">
             <label for="inspirationLinks">روابط تصاميم تعجبك (إلهام)</label>
             <textarea id="inspirationLinks" rows="2" placeholder="instagram.com/design | behance.net/project | pinterest.com/board"></textarea>
+            <span class="hint">الأفضل إضافة سبب الإعجاب: الألوان، الخطوط، طريقة العرض، الإحساس العام...</span>
+        </div>
+        <div class="mini-grid">
+            <div class="form-group">
+                <label for="mustAvoid">ما الذي يجب تجنبه بصرياً؟</label>
+                <textarea id="mustAvoid" rows="2" placeholder="ألوان، رموز، أساليب، صور، أو تشابه مع منافس..."></textarea>
+            </div>
+            <div class="form-group">
+                <label for="brandAssets">المواد المتوفرة حالياً</label>
+                <textarea id="brandAssets" rows="2" placeholder="شعار، صور منتجات، خطوط، Brand Guidelines، نصوص، حسابات... أو لا يوجد"></textarea>
+            </div>
+        </div>
+        <div class="mini-grid">
+            <div class="form-group">
+                <label for="accessibilityNeeds">متطلبات الوصول والقراءة</label>
+                <select id="accessibilityNeeds">
+                    <option value="" disabled selected>اختر إن وجد</option>
+                    <option value="تباين عال وقراءة واضحة">تباين عال وقراءة واضحة</option>
+                    <option value="خط عربي واضح لكبار السن">خط عربي واضح لكبار السن</option>
+                    <option value="تصميم مناسب للجوال أولاً">تصميم مناسب للجوال أولاً</option>
+                    <option value="لا توجد متطلبات خاصة">لا توجد متطلبات خاصة</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="fileFormats">صيغ الملفات المطلوبة</label>
+                <input type="text" id="fileFormats" placeholder="AI, SVG, PDF, PNG, Figma, Canva, PSD...">
+            </div>
         </div>
     </div>
 
@@ -400,25 +535,86 @@
         <div class="step-header">
             <span class="step-badge">الخطوة ٦ من ٦</span>
             <h2>التفاصيل العملية</h2>
-            <p>آخر خطوة وسيكون بريفك جاهزاً! 🎯</p>
+            <p>حدد القيود والاعتمادات ومقاييس النجاح لتسهيل التنفيذ والتسعير</p>
         </div>
         <div class="form-group">
             <label for="competitors">أبرز المنافسين (روابط أو أسماء)</label>
-            <textarea id="competitors" rows="2" placeholder="www.competitor.com أو اسم المنشأة"></textarea>
+            <textarea id="competitors" rows="2" placeholder="www.competitor.com أو اسم المنشأة + ما الذي تريد التفوق عليه؟"></textarea>
+        </div>
+        <div class="mini-grid">
+            <div class="form-group">
+                <label for="budget">الميزانية المتوقعة للمشروع</label>
+                <select id="budget">
+                    <option value="" disabled selected>اختر النطاق السعري</option>
+                    <option value="أقل من 500$">أقل من 500$</option>
+                    <option value="500$ – 1,000$">500$ – 1,000$</option>
+                    <option value="1,000$ – 3,000$">1,000$ – 3,000$</option>
+                    <option value="أكثر من 3,000$">أكثر من 3,000$</option>
+                    <option value="غير محددة بعد">غير محددة بعد</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="deadline">موعد التسليم المطلوب <span class="req">*</span></label>
+                <input type="text" id="deadline" placeholder="مثال: خلال أسبوعين / قبل 15 يوليو">
+                <div class="field-err" id="err-deadline">حدد موعداً تقريبياً لتقدير النطاق والأولوية ⚠️</div>
+            </div>
+        </div>
+        <div class="mini-grid">
+            <div class="form-group">
+                <label for="priority">الأولوية الأهم</label>
+                <select id="priority">
+                    <option value="" disabled selected>اختر الأولوية</option>
+                    <option value="سرعة التنفيذ">سرعة التنفيذ</option>
+                    <option value="جودة وتفاصيل عالية">جودة وتفاصيل عالية</option>
+                    <option value="التكلفة المناسبة">التكلفة المناسبة</option>
+                    <option value="مرونة وتعديلات كثيرة">مرونة وتعديلات كثيرة</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="approvalProcess">طريقة الاعتماد</label>
+                <select id="approvalProcess">
+                    <option value="" disabled selected>اختر الطريقة</option>
+                    <option value="شخص واحد يعتمد القرار">شخص واحد يعتمد القرار</option>
+                    <option value="فريق صغير يراجع ويعتمد">فريق صغير يراجع ويعتمد</option>
+                    <option value="إدارة / لجنة اعتماد">إدارة / لجنة اعتماد</option>
+                    <option value="غير محدد بعد">غير محدد بعد</option>
+                </select>
+            </div>
+        </div>
+        <div class="mini-grid">
+            <div class="form-group">
+                <label for="contentStatus">حالة المحتوى والمواد</label>
+                <select id="contentStatus">
+                    <option value="" disabled selected>اختر الحالة</option>
+                    <option value="كل المحتوى جاهز">كل المحتوى جاهز</option>
+                    <option value="بعض المحتوى جاهز">بعض المحتوى جاهز</option>
+                    <option value="نحتاج كتابة / جمع محتوى">نحتاج كتابة / جمع محتوى</option>
+                    <option value="غير واضح بعد">غير واضح بعد</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="revisionRounds">عدد جولات التعديل المتوقعة</label>
+                <select id="revisionRounds">
+                    <option value="" disabled selected>اختر العدد</option>
+                    <option value="جولة واحدة">جولة واحدة</option>
+                    <option value="جولتان">جولتان</option>
+                    <option value="3 جولات">3 جولات</option>
+                    <option value="غير محدد — حسب الاتفاق">غير محدد — حسب الاتفاق</option>
+                </select>
+            </div>
         </div>
         <div class="form-group">
-            <label for="budget">الميزانية المتوقعة للمشروع</label>
-            <select id="budget">
-                <option value="" disabled selected>اختر النطاق السعري</option>
-                <option value="أقل من 500$">أقل من 500$</option>
-                <option value="500$ – 1,000$">500$ – 1,000$</option>
-                <option value="1,000$ – 3,000$">1,000$ – 3,000$</option>
-                <option value="أكثر من 3,000$">أكثر من 3,000$</option>
-            </select>
+            <label for="successMetrics">كيف سنعرف أن المشروع نجح؟</label>
+            <textarea id="successMetrics" rows="2" placeholder="مثال: زيادة الطلبات 20%، وضوح الهوية، إطلاق الحملة في موعدها، قبول الإدارة..."></textarea>
+        </div>
+        <div class="form-group">
+            <label for="legalConstraints">قيود قانونية أو تقنية أو ثقافية</label>
+            <textarea id="legalConstraints" rows="2" placeholder="حقوق صور وخطوط، ممنوع استخدام رموز معينة، متطلبات طباعة، قواعد منصة، تراخيص..."></textarea>
         </div>
         <div class="form-group">
             <label>المخرجات المطلوبة (Deliverables):</label>
             <div class="check-group" id="dynDeliverables"></div>
+            <input type="text" id="deliverablesOther" placeholder="مخرجات إضافية أو تفاصيل التسليم" style="margin-top:10px;">
         </div>
     </div>
 
@@ -427,12 +623,19 @@
         <div style="text-align:center;margin-bottom:22px;">
             <div class="success-icon"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>
             <h2 style="font-size:24px;font-weight:900;color:var(--primary);">البريف جاهز! 🎉</h2>
-            <p style="color:var(--muted);margin-top:6px;">راجع الملخص ثم حمّله كـ PDF</p>
+            <p style="color:var(--muted);margin-top:6px;">راجع الملخص العملي، وانسخه أو حمّله لمشاركته مع المصمم أو العميل</p>
         </div>
         <div class="brief-wrap" id="briefContent"></div>
-        <div style="display:flex;flex-direction:column;gap:9px;margin-top:6px;">
-            <button class="btn btn-pdf"   onclick="exportPDF()">📄 تحميل البريف كـ PDF</button>
-            <button class="btn btn-img"   onclick="exportImage()">🖼️ تحميل البريف كـ صورة PNG</button>
+        <div class="export-toolbar">
+            <button class="btn btn-pdf"   onclick="exportPDF()">📄 PDF مصمم</button>
+            <button class="btn btn-print" onclick="printBrief()">🖨️ PDF قابل للنسخ</button>
+            <button class="btn btn-img"   onclick="exportImage()">🖼️ صورة PNG</button>
+            <button class="btn btn-copy"  onclick="copyBriefText()">📋 نسخ كنص</button>
+            <button class="btn btn-html"  onclick="exportHTML()">🌐 ملف HTML</button>
+            <button class="btn btn-json"  onclick="exportJSON()">{ } بيانات JSON</button>
+        </div>
+        <div class="export-status" id="exportStatus"></div>
+        <div style="display:flex;flex-direction:column;gap:9px;margin-top:10px;">
             <button class="btn btn-reset" onclick="resetAll()">🔄 إنشاء بريف جديد</button>
         </div>
     </div>
@@ -745,9 +948,12 @@ const getSteps  = () => document.querySelectorAll('.s-item');
 /* ════════════════════════════════════════════════
    DATA HELPERS
 ════════════════════════════════════════════════ */
-const fieldVal  = id => document.getElementById(id)?.value?.trim() || '—';
-const radioVal  = name => document.querySelector(`input[name="${name}"]:checked`)?.value || '—';
-const checksVal = name => [...document.querySelectorAll(`input[name="${name}"]:checked`)].map(i=>i.value).join('، ') || '—';
+const rawFieldVal = id => document.getElementById(id)?.value?.trim() || '';
+const escapeHtml = value => String(value || '—').replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
+const fieldVal  = id => escapeHtml(rawFieldVal(id) || '—');
+const radioVal  = name => escapeHtml(document.querySelector(`input[name="${name}"]:checked`)?.value || '—');
+const checksVal = name => escapeHtml([...document.querySelectorAll(`input[name="${name}"]:checked`)].map(i=>i.value).join('، ') || '—');
+const combineVals = (...vals) => escapeHtml(vals.map(v => String(v || '').trim()).filter(Boolean).join('، ') || '—');
 
 /* ════════════════════════════════════════════════
    COLOR CHIPS
@@ -851,9 +1057,27 @@ function validatePane(n) {
     if (n === 2) {
         const nm = document.getElementById('clientName');
         const ds = document.getElementById('clientDesc');
-        const nb = !nm.value.trim(), db = !ds.value.trim();
+        const cn = document.getElementById('contactName');
+        const cm = document.getElementById('contactMethod');
+        const goals = document.querySelector('input[name="projectGoals"]:checked') || rawFieldVal('projectGoalsOther');
+        const nb = !nm.value.trim(), db = !ds.value.trim(), cb = !cn.value.trim(), mb = !cm.value.trim(), gb = !goals;
         showErr('err-clientName', nb); markField(nm, nb); if (nb) ok = false;
         showErr('err-clientDesc', db); markField(ds, db); if (db) ok = false;
+        showErr('err-contactName', cb); markField(cn, cb); if (cb) ok = false;
+        showErr('err-contactMethod', mb); markField(cm, mb); if (mb) ok = false;
+        showErr('err-projectGoals', gb); if (gb) ok = false;
+    }
+
+    if (n === 3) {
+        const aud = document.getElementById('targetAudience');
+        const bad = !aud.value.trim();
+        showErr('err-targetAudience', bad); markField(aud, bad); if (bad) ok = false;
+    }
+
+    if (n === 5) {
+        const dl = document.getElementById('deadline');
+        const bad = !dl.value.trim();
+        showErr('err-deadline', bad); markField(dl, bad); if (bad) ok = false;
     }
 
     return ok;
@@ -922,145 +1146,307 @@ function buildSuccess() {
         : '';
 
     document.getElementById('briefContent').innerHTML = `
-        <h3>📋 ملخص البريف — ${date}</h3>
-        ${mkSection('المشروع', [['النوع', cfg ? `${cfg.emoji} ${cfg.label}` : '—']])}
-        ${mkSection('معلومات العميل', [
+        <h3>📋 ملخص البريف الشامل — ${date}</h3>
+        <div class="brief-export-meta">
+            <span>العميل: ${fieldVal('clientName')}</span>
+            <span>نوع المشروع: ${cfg ? `${cfg.emoji} ${cfg.label}` : '—'}</span>
+            <span>تاريخ التصدير: ${date}</span>
+        </div>
+        ${mkSection('المشروع', [
+            ['النوع', cfg ? `${cfg.emoji} ${cfg.label}` : '—'],
+            ['أهداف المشروع', combineVals(checksVal('projectGoals').replace('—',''), rawFieldVal('projectGoalsOther'))],
+            ['مرحلة المشروع', fieldVal('businessStage')],
+            ['المشكلة المطلوب حلها', fieldVal('problemSolve')],
+        ])}
+        ${mkSection('معلومات العميل والقرار', [
             ['اسم الجهة',      fieldVal('clientName')],
             ['المدينة / البلد', fieldVal('clientCity')],
+            ['مسؤول التواصل / القرار', fieldVal('contactName')],
+            ['وسيلة التواصل', fieldVal('contactMethod')],
             ['وصف النشاط',     fieldVal('clientDesc')],
+            ['الوعد الأساسي', fieldVal('brandPromise')],
         ])}
         ${domainSection}
         ${mkSection('شخصية العلامة والجمهور', [
             ['الجمهور المستهدف', fieldVal('targetAudience')],
-            ['تقليدي ↔ عصري', sliderLabel(document.getElementById('sl1').value,'تقليدي','عصري')],
-            ['مرح ↔ رسمي',    sliderLabel(document.getElementById('sl2').value,'مرح/شبابي','جاد/رسمي')],
-            ['اقتصادي ↔ فاخر', sliderLabel(document.getElementById('sl3').value,'اقتصادي','فاخر/Premium')],
+            ['احتياج / ألم الجمهور', fieldVal('audiencePain')],
+            ['الفعل المطلوب', fieldVal('desiredAction')],
+            ['نبرة التواصل', fieldVal('brandTone')],
+            ['الرسالة الرئيسية', fieldVal('mainMessage')],
+            ['تقليدي ↔ عصري', escapeHtml(sliderLabel(document.getElementById('sl1').value,'تقليدي','عصري'))],
+            ['مرح ↔ رسمي',    escapeHtml(sliderLabel(document.getElementById('sl2').value,'مرح/شبابي','جاد/رسمي'))],
+            ['اقتصادي ↔ فاخر', escapeHtml(sliderLabel(document.getElementById('sl3').value,'اقتصادي','فاخر/Premium'))],
         ])}
-        ${mkSection('التوجه البصري', [
+        ${mkSection('التوجه البصري والمواد', [
             ['الأسلوب البصري', checksVal('visualStyle')],
             ['مصادر الإلهام',  fieldVal('inspirationLinks')],
+            ['ما يجب تجنبه', fieldVal('mustAvoid')],
+            ['المواد المتوفرة', fieldVal('brandAssets')],
+            ['متطلبات الوصول', fieldVal('accessibilityNeeds')],
+            ['صيغ الملفات', fieldVal('fileFormats')],
         ])}
-        ${mkSection('التفاصيل العملية', [
-            ['المنافسون',         fieldVal('competitors')],
-            ['الميزانية',         fieldVal('budget')],
-            ['المخرجات المطلوبة', checksVal('deliverable')],
+        ${mkSection('التنفيذ والتسليم', [
+            ['المنافسون', fieldVal('competitors')],
+            ['الميزانية', fieldVal('budget')],
+            ['موعد التسليم', fieldVal('deadline')],
+            ['الأولوية', fieldVal('priority')],
+            ['طريقة الاعتماد', fieldVal('approvalProcess')],
+            ['حالة المحتوى', fieldVal('contentStatus')],
+            ['جولات التعديل', fieldVal('revisionRounds')],
+            ['مقاييس النجاح', fieldVal('successMetrics')],
+            ['قيود قانونية / تقنية', fieldVal('legalConstraints')],
+            ['المخرجات المطلوبة', combineVals(checksVal('deliverable').replace('—',''), rawFieldVal('deliverablesOther'))],
         ])}
+        <div class="brief-export-footer">تم إنشاء هذا البريف بواسطة Brief Studio — جاهز للمشاركة والتسعير والتنفيذ.</div>
     `;
 
     document.getElementById('successPane').style.display = 'block';
 }
 
 /* ════════════════════════════════════════════════
-   CAPTURE HELPER — يلتقط العنصر كـ Canvas
+   EXPORT HELPERS — تصدير محسّن ومنظم
 ════════════════════════════════════════════════ */
-async function captureElement(element) {
+function setExportStatus(message, timeout = 3500) {
+    const box = document.getElementById('exportStatus');
+    if (!box) return;
+    box.textContent = message;
+    box.classList.add('show');
+    if (timeout) setTimeout(() => box.classList.remove('show'), timeout);
+}
+
+function cleanText(value) {
+    const div = document.createElement('div');
+    div.innerHTML = value || '';
+    return (div.textContent || div.innerText || '').trim();
+}
+
+function safeFileName(ext) {
+    const name = rawFieldVal('clientName') || 'project';
+    const type = cleanText(radioVal('projectType')) || 'brief';
+    const date = new Date().toISOString().slice(0,10);
+    const safe = `${name}_${type}_${date}`
+        .replace(/[\\/:*?"<>|]+/g, '-')
+        .replace(/\s+/g, '-')
+        .replace(/-+/g, '-')
+        .replace(/^-|-$/g, '')
+        .slice(0, 90) || 'brief';
+    return `brief_${safe}.${ext}`;
+}
+
+function downloadBlob(content, filename, type) {
+    const blob = new Blob([content], {type});
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = filename;
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+}
+
+function getBriefText() {
+    const el = document.getElementById('briefContent');
+    return el.innerText.replace(/\n{3,}/g, '\n\n').trim();
+}
+
+function getBriefData() {
+    const root = document.getElementById('briefContent');
+    const data = {
+        title: cleanText(root.querySelector('h3')?.innerHTML || 'ملخص البريف'),
+        exportedAt: new Date().toISOString(),
+        clientName: rawFieldVal('clientName') || null,
+        projectType: document.querySelector('input[name="projectType"]:checked')?.value || null,
+        sections: []
+    };
+    root.querySelectorAll('.b-section').forEach(section => {
+        const title = cleanText(section.querySelector('.b-section-title')?.innerHTML || 'قسم');
+        const rows = [];
+        section.querySelectorAll('.b-row').forEach(row => {
+            rows.push({
+                label: cleanText(row.querySelector('.b-lbl')?.innerHTML || ''),
+                value: cleanText(row.querySelector('.b-val')?.innerHTML || '')
+            });
+        });
+        data.sections.push({title, rows});
+    });
+    return data;
+}
+
+function makeExportClone() {
+    const source = document.getElementById('briefContent');
+    const clone = source.cloneNode(true);
+    clone.id = 'briefContentExport';
+    clone.style.width = '794px';
+    clone.style.maxWidth = '794px';
+    clone.style.background = '#ffffff';
+    clone.style.padding = '34px';
+    clone.style.margin = '0';
+    clone.style.boxSizing = 'border-box';
+    clone.style.position = 'fixed';
+    clone.style.left = '-10000px';
+    clone.style.top = '0';
+    clone.style.direction = 'rtl';
+    clone.style.fontFamily = "'Tajawal', Arial, sans-serif";
+    document.body.appendChild(clone);
+    return clone;
+}
+
+async function captureElement(element, scale = 2.6) {
     if (typeof window.html2canvas !== 'function') {
         throw new Error('مكتبة html2canvas لم تُحمَّل — تأكد من اتصالك بالإنترنت وأعد تحميل الصفحة.');
     }
     await document.fonts.ready;
     return window.html2canvas(element, {
-        scale: 2,
+        scale,
         useCORS: true,
-        allowTaint: true,
+        allowTaint: false,
         logging: false,
-        backgroundColor: '#F4F6F9',
+        backgroundColor: '#ffffff',
         scrollX: 0,
-        scrollY: -window.scrollY,
+        scrollY: 0,
         windowWidth: element.scrollWidth,
         windowHeight: element.scrollHeight,
         onclone: (clonedDoc) => {
             clonedDoc.querySelectorAll('*').forEach(el => {
                 el.style.letterSpacing = '0px';
-                el.style.wordSpacing   = '0px';
+                el.style.wordSpacing = '0px';
+                el.style.textRendering = 'geometricPrecision';
             });
         },
     });
 }
 
-/* ════════════════════════════════════════════════
-   PDF EXPORT — تحويل إلى صورة ثم PDF
-════════════════════════════════════════════════ */
+/* PDF مصمم: صورة عالية الجودة داخل صفحات A4 */
 async function exportPDF() {
     const btn = document.querySelector('.btn-pdf');
-    btn.textContent = '⏳ جاري التحضير...'; btn.disabled = true;
-
-    const element = document.getElementById('briefContent');
+    btn.textContent = '⏳ تجهيز PDF...'; btn.disabled = true;
+    setExportStatus('جاري تجهيز PDF بجودة أعلى...', 0);
+    let clone;
 
     try {
-        const canvas = await captureElement(element);
+        clone = makeExportClone();
+        const canvas = await captureElement(clone, 2.8);
 
-        const pdf = new window.jspdf.jsPDF({
-            unit: 'mm',
-            format: 'a4',
-            orientation: 'portrait'
-        });
+        const pdf = new window.jspdf.jsPDF({ unit: 'mm', format: 'a4', orientation: 'portrait', compress: true });
+        const pageW = pdf.internal.pageSize.getWidth();
+        const pageH = pdf.internal.pageSize.getHeight();
+        const margin = 8;
+        const imgW = pageW - margin * 2;
+        const imgH = (canvas.height * imgW) / canvas.width;
+        const usableH = pageH - margin * 2;
 
-        const pageW  = pdf.internal.pageSize.getWidth();
-        const pageH  = pdf.internal.pageSize.getHeight();
-        const margin = 10;
-        const imgW   = pageW - margin * 2;
-        const imgH   = (canvas.height * imgW) / canvas.width;
+        let yPx = 0;
+        const pxPerMm = canvas.width / imgW;
+        const slicePx = Math.floor(usableH * pxPerMm);
+        let pageIndex = 0;
 
-        let yRemaining = imgH;
-        let yOffset    = 0;
-
-        while (yRemaining > 0) {
-            const sliceH = Math.min(yRemaining, pageH - margin * 2);
-
-            const pageCanvas  = document.createElement('canvas');
-            const scaleRatio  = canvas.width / imgW;
-            pageCanvas.width  = canvas.width;
-            pageCanvas.height = sliceH * scaleRatio;
-
+        while (yPx < canvas.height) {
+            const remainingPx = canvas.height - yPx;
+            const currentSlicePx = Math.min(slicePx, remainingPx);
+            const pageCanvas = document.createElement('canvas');
+            pageCanvas.width = canvas.width;
+            pageCanvas.height = currentSlicePx;
             const ctx = pageCanvas.getContext('2d');
-            ctx.drawImage(
-                canvas,
-                0, yOffset * scaleRatio,
-                canvas.width, pageCanvas.height,
-                0, 0,
-                canvas.width, pageCanvas.height
-            );
+            ctx.fillStyle = '#ffffff';
+            ctx.fillRect(0, 0, pageCanvas.width, pageCanvas.height);
+            ctx.drawImage(canvas, 0, yPx, canvas.width, currentSlicePx, 0, 0, canvas.width, currentSlicePx);
 
-            const sliceData = pageCanvas.toDataURL('image/jpeg', 0.95);
-            pdf.addImage(sliceData, 'JPEG', margin, margin, imgW, sliceH);
-
-            yOffset    += sliceH;
-            yRemaining -= sliceH;
-
-            if (yRemaining > 0) pdf.addPage();
+            if (pageIndex > 0) pdf.addPage();
+            const sliceH = currentSlicePx / pxPerMm;
+            pdf.addImage(pageCanvas.toDataURL('image/jpeg', 0.98), 'JPEG', margin, margin, imgW, sliceH, undefined, 'SLOW');
+            yPx += currentSlicePx;
+            pageIndex++;
         }
 
-        pdf.save(`brief_${fieldVal('clientName') || 'project'}.pdf`);
-
+        pdf.save(safeFileName('pdf'));
+        setExportStatus('تم تصدير PDF المصمم بنجاح ✅');
     } catch (err) {
         console.error('PDF export failed:', err);
         alert('⚠️ ' + (err?.message || 'حدث خطأ أثناء تصدير PDF، يرجى المحاولة مجدداً.'));
+        setExportStatus('تعذر تصدير PDF. جرّب خيار PDF قابل للنسخ.', 5000);
     } finally {
-        btn.innerHTML = '📄 تحميل البريف كـ PDF'; btn.disabled = false;
+        clone?.remove();
+        btn.innerHTML = '📄 PDF مصمم'; btn.disabled = false;
     }
 }
 
-/* ════════════════════════════════════════════════
-   IMAGE EXPORT — تحميل البريف كـ PNG
-════════════════════════════════════════════════ */
+/* PDF قابل للنسخ: يستخدم نافذة الطباعة الأصلية */
+function printBrief() {
+    document.title = safeFileName('pdf').replace('.pdf', '');
+    setExportStatus('اختر Save as PDF من نافذة الطباعة للحصول على ملف قابل للبحث والنسخ.', 6000);
+    setTimeout(() => window.print(), 150);
+}
+
+/* PNG عالي الدقة */
 async function exportImage() {
     const btn = document.querySelector('.btn-img');
-    btn.textContent = '⏳ جاري التحضير...'; btn.disabled = true;
-
-    const element = document.getElementById('briefContent');
+    btn.textContent = '⏳ تجهيز الصورة...'; btn.disabled = true;
+    setExportStatus('جاري تجهيز صورة عالية الدقة...', 0);
+    let clone;
 
     try {
-        const canvas = await captureElement(element);
-        const link = document.createElement('a');
-        link.download = `brief_${fieldVal('clientName') || 'project'}.png`;
-        link.href = canvas.toDataURL('image/png');
-        link.click();
+        clone = makeExportClone();
+        const canvas = await captureElement(clone, 3);
+        canvas.toBlob((blob) => {
+            if (!blob) throw new Error('تعذر إنشاء ملف الصورة');
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.download = safeFileName('png');
+            link.href = url;
+            link.click();
+            setTimeout(() => URL.revokeObjectURL(url), 1000);
+            setExportStatus('تم تصدير الصورة بنجاح ✅');
+        }, 'image/png');
     } catch (err) {
         console.error('Image export failed:', err);
         alert('حدث خطأ أثناء تصدير الصورة، يرجى المحاولة مجدداً.');
+        setExportStatus('تعذر تصدير الصورة.', 5000);
     } finally {
-        btn.innerHTML = '🖼️ تحميل البريف كـ صورة PNG'; btn.disabled = false;
+        clone?.remove();
+        btn.innerHTML = '🖼️ صورة PNG'; btn.disabled = false;
     }
+}
+
+/* نسخ نص البريف */
+async function copyBriefText() {
+    const text = getBriefText();
+    try {
+        await navigator.clipboard.writeText(text);
+        setExportStatus('تم نسخ البريف كنص ✅');
+    } catch (err) {
+        const area = document.createElement('textarea');
+        area.value = text;
+        document.body.appendChild(area);
+        area.select();
+        document.execCommand('copy');
+        area.remove();
+        setExportStatus('تم نسخ البريف كنص ✅');
+    }
+}
+
+/* HTML مستقل للمشاركة */
+function exportHTML() {
+    const content = document.getElementById('briefContent').outerHTML;
+    const html = `<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>${cleanText(fieldVal('clientName')) || 'Brief'} — Brief Studio</title>
+<style>
+body{font-family:Arial,'Tahoma',sans-serif;background:#f4f6f9;color:#1B2A4A;margin:0;padding:24px;direction:rtl}.brief-wrap{max-width:850px;margin:auto;background:#fff;border-radius:16px;padding:28px;box-shadow:0 8px 30px rgba(27,42,74,.08)}h3{border-bottom:2px solid #E2E8F0;padding-bottom:12px}.brief-export-meta{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 18px}.brief-export-meta span{border:1px solid #E2E8F0;border-radius:999px;padding:6px 10px;color:#6B7A99;font-size:12px}.b-section{margin:0 0 18px;break-inside:avoid}.b-section-title{color:#D4AF37;font-weight:bold;font-size:12px;margin-bottom:8px}.b-row{display:flex;gap:16px;justify-content:space-between;border-bottom:1px solid #E2E8F0;padding:8px 0}.b-lbl{color:#6B7A99;min-width:150px}.b-val{font-weight:bold;text-align:left;word-break:break-word}.brief-export-footer{text-align:center;color:#6B7A99;border-top:2px solid #E2E8F0;padding-top:14px;margin-top:20px}@media(max-width:650px){.b-row{flex-direction:column}.b-val{text-align:right}}
+</style>
+</head><body>${content}</body></html>`;
+    downloadBlob(html, safeFileName('html'), 'text/html;charset=utf-8');
+    setExportStatus('تم تنزيل ملف HTML مستقل ✅');
+}
+
+/* JSON منظم للاستخدام مع أدوات أخرى */
+function exportJSON() {
+    const json = JSON.stringify(getBriefData(), null, 2);
+    downloadBlob(json, safeFileName('json'), 'application/json;charset=utf-8');
+    setExportStatus('تم تنزيل بيانات JSON ✅');
 }
 
 /* ════════════════════════════════════════════════
@@ -1072,9 +1458,11 @@ function resetAll() {
     document.getElementById('navBtns').style.display = 'flex';
     document.getElementById('stepperNav').style.display = 'flex';
     document.querySelector('.progress-bar-wrap').style.display = 'block';
-    document.querySelectorAll('input[type="text"],textarea,select').forEach(el => el.value='');
+    document.querySelectorAll('input[type="text"],input[type="url"],input[type="date"],textarea,select').forEach(el => el.value='');
     document.querySelectorAll('input[type="radio"],input[type="checkbox"]').forEach(el => el.checked=false);
     document.querySelectorAll('.card-opt,.color-chip').forEach(el => el.classList.remove('sel','picked'));
+    document.querySelectorAll('.field-err').forEach(el => el.classList.remove('show'));
+    document.querySelectorAll('.err').forEach(el => el.classList.remove('err'));
     ['sl1','sl2','sl3'].forEach((id,i) => {
         document.getElementById(id).value = 3;
         document.getElementById(['sv1','sv2','sv3'][i]).textContent = 3;
